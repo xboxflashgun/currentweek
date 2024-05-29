@@ -34,9 +34,16 @@ body {
 	color: #eee;
 }
 
+#filterdiv	{
+	width: 1148px;
+	float: left;
+	background-color: #525;
+	height: 20px;
+}
+
 #linechart	{
 	width: 1148px;
-	height: 600px;
+	height: 580px;
 	background-color: #111;
 	float: left;
 }
