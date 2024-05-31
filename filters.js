@@ -1,20 +1,20 @@
 var filters = [
 	{
 		name: "country",		// request + divname
-		sels: [1,2,3],			// selection list
+		sels: [],			// selection list
 		tab: [],			// data
 	},
 	{
 		name: "lang",
-		sels: [4,5,6],
+		sels: [],
 	},
 	{
 		name: "genre",
-		sels: [7,8,9],
+		sels: [],
 	},
 	{
 		name: "game",
-		sels: [10,11,12],
+		sels: [],
 	}
 ];
 

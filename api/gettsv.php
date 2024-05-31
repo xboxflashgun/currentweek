@@ -44,28 +44,43 @@ function getdata()	{
 	$join = '';
 
 	if(isset($_GET['country']))
-		$where .= " and countryid=any(array[" . $_GET['country'] . "])";
+		if(strlen($_GET['country']) > 0)
+			$where .= " and countryid=any(array[" . $_GET['country'] . "])";
+		else
+			$where .= " and countryid is null";
 	else
 		$select = "countryid,players";
 
 
 	if(isset($_GET['lang']))
-		$where .= " and langid=any(array[" . $_GET['lang'] . "])";
+		if(strlen($_GET['lang']) > 0)
+			$where .= " and langid=any(array[" . $_GET['lang'] . "])";
+		else
+			$where .= " and langid is null";
 	else
 		$select = "langid,players";
 
 	if(isset($_GET['game']))
-		$where .= " and titleid=any(array[" . $_GET['game']. "])";
+		if(strlen($_GET['game']) > 0)
+			$where .= " and titleid=any(array[" . $_GET['game']. "])";
+		else
+			;
 	else
 		$select = "titleid,players";
 
 	if(isset($_GET['genre']))
-		$where .= " and titleid=any(select titleid from gamegenres where genreid=any(array[" . $_GET['genre'] . "]))";
+		if(strlen($_GET['genre']) > 0)
+			$where .= " and titleid=any(select titleid from gamegenres where genreid=any(array[" . $_GET['genre'] . "]))";
+		else
+			;
 	else	{
 		$select = "genreid,sum(players)";
 		$join = "join gamegenres using(titleid)";
 		$group = "group by genreid";
 	}
+
+	if( isset($_GET['game']) && isset($_GET['genre']) && strlen($_GET['genre']) == 0 && strlen($_GET['game']) == 0 )
+		$where .= " and titleid is null";
 
 	echo implode(pg_copy_to($db, "(
 
@@ -74,6 +89,7 @@ function getdata()	{
 		$join
 		where $where
 		$group
+		limit 300
 
 	)", chr(9)));
 
