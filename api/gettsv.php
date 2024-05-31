@@ -103,6 +103,17 @@ function getdata()	{
 	if( isset($_GET['game']) && isset($_GET['genre']) && strlen($_GET['genre']) == 0 && strlen($_GET['game']) == 0 )
 		$where .= " and titleid is null";
 
+	error_log("
+		select $select
+		from hourlytab
+		$join
+		where $where
+		$group
+		limit 300
+	");
+
+
+
 	echo implode(pg_copy_to($db, "(
 
 		select $select

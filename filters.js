@@ -35,8 +35,8 @@ function barchart(f)	{
 
 	var div = d3.select(`#${f.name}div .svg`);
 
-	const margin = { top: 30, right: 30, bottom: 70, left: 60 },
-		width = f.tab.length*6 - margin.left - margin.right,
+	var margin = { top: 20, right: 30, bottom: 40, left: 60 },
+		width = f.tab.length * 6 - margin.left - margin.right,
 		height = div.node().clientHeight - margin.top - margin.bottom;
 
 	var svg = div.append("svg")
@@ -48,11 +48,31 @@ function barchart(f)	{
 	// X axis
 	f.x = d3.scaleBand()
 		.range([ 0, width ])
-		.domain(f.tab.map( d => d.name ))
+		.domain(f.tab.sort( (a,b) => b.players-a.players ).map( d => d.name ))
 		.padding(0.2);
 	svg.append("g")
 		.attr("transform", `translate(0,${height})`)
 		.call(d3.axisBottom(f.x));
+
+	// Y axis
+	f.y = d3.scaleLinear()
+		.range( [ height, 0 ] )
+		.domain( [ 0, d3.max(f.tab, d => d.players) ]);
+	svg.append("g")
+		.call(d3.axisLeft(f.y));
+
+	// bars
+	
+	var u = svg.selectAll("rect")
+		.data(f.tab);
+	u.join(enter => {
+		enter.append("rect")
+		.attr("x", d => f.x(d.name))
+		.attr("y", d => f.y(d.players))
+		.attr("width", f.x.bandwidth())
+		.attr("height", d => height - f.y(d.players))
+		.attr("fill", "green")
+	});
 
 }
 
@@ -75,7 +95,7 @@ function readalldata()	{
 
 			});
 
-			console.log(f);
+			console.log('all', f);
 
 			if(f.drawer)
 				f.drawer(f);
@@ -117,6 +137,7 @@ function readdata(f)	{
 
 	var req = makereqstr(f);
 
+	console.log("api/gettsv.php?f=getdata" + req);
 	return fetch("api/gettsv.php?f=getdata" + req)
 	.then( res => res.text() )
 	.then( res => {
@@ -135,6 +156,8 @@ function readdata(f)	{
 				f.tab.push( {id: id, players: players} );
 
 		});
+
+		console.log('rd', f);
 
 	});
 
