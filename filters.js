@@ -97,7 +97,6 @@ function barchart(f)	{
 	u.join(enter => {
 		enter.append("rect")
 			.transition()
-	//		.duration(100)
 			.attr("x", d => f.x(d.name))
 			.attr("y", d => f.y(d.val))
 			.attr("width", f.x.bandwidth())
@@ -123,8 +122,6 @@ function barchart(f)	{
 			.duration(700)
 			.remove();
 	});
-	//	.transition()
-	//	.duration(2000);
 
 	function select(id)	{
 
@@ -150,6 +147,13 @@ function barchart(f)	{
 		select(id);
 		d3.select(e.target).attr("fill", f.sels.has(id) ? 'red' : 'green');
 	});
+
+	// mark xaxis text
+	f.xaxis.selectAll("text").attr("color", null);
+	f.xaxis.selectAll("text")
+		.filter( d => f.sels.has(
+			Object.keys(f.idname).filter(e => f.idname[e][0] === d)[0] ))
+		.attr("color", "#fff");
 
 }
 
@@ -212,13 +216,26 @@ function listfilters()	{
 
 	filters.forEach( f => {
 
+		var sp = span.append("span");
+
 		Array.from(f.sels).forEach( id => {
 
-			span.append("span").attr("title", f.idname[id][1]).text( f.idname[id][0] );
+			sp.append("span")
+				.attr("title", f.idname[id][1]).text( f.idname[id][0] )
+				.attr("data-id", id);
+
+		});
+	
+		sp.selectAll("span").on("click", e => {
+
+			var id = e.target.dataset.id;
+			f.sels.delete(id);
+			readalldata();
 
 		});
 
 	});
+
 
 }
 
