@@ -3,31 +3,44 @@
 var filters = [
 	{
 		name: "country",		// request + divname
-		sels: [],			// selection list
-		tab: [],			// data
+		sels: new Set(),			// selection list
+		tab: [],			// data: { id: ..., name: ..., players: ..., title: ..., val: ...
 		idname: {},			// idname[id] = name
 		drawer: barchart,
 	},
 	{
 		name: "lang",
-		sels: [],
+		sels: new Set(),
 		tab: [],
 		idname: {},
 		drawer: barchart,
 	},
 	{
 		name: "genre",
-		sels: [],
+		sels: new Set(),
 		tab: [],
 		idname: {},
 	},
 	{
 		name: "game",
-		sels: [],
+		sels: new Set(),
 		tab: [],
 		idname: {}, 
 	}
 ];
+
+// set value: absolute/percentage
+function setvals(f)	{
+
+	if(f.ref)	{
+
+		var percflag = d3.select('#infodiv input[value="perc"]').property("checked");
+
+		f.tab.forEach( t => t.val = (percflag) ? 100. * t.players/f.ref : t.players );
+
+	}
+
+}
 
 
 // barchart for country and language
@@ -36,42 +49,77 @@ function barchart(f)	{
 	var div = d3.select(`#${f.name}div .svg`);
 
 	var margin = { top: 20, right: 30, bottom: 40, left: 60 },
-		width = f.tab.length * 6 - margin.left - margin.right,
+		width = f.tab.length * 20 + 90 - margin.left - margin.right,
 		height = div.node().clientHeight - margin.top - margin.bottom;
 
-	var svg = div.append("svg")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
-		.append("g")
-			.attr("transform", `translate(${margin.left},${margin.top})`);
+	console.log(f);
+
+	if( ! f.svg )	{
+
+		f.svg = div.append("svg")
+			.attr("height", height + margin.top + margin.bottom)
+		    .append("g")
+				.attr("transform", `translate(${margin.left},${margin.top})`);
+		f.x = d3.scaleBand();
+		f.xaxis = f.svg.append("g");
+
+		f.y = d3.scaleLinear();
+		f.yaxis = f.svg.append("g");
+		f.y.range( [ height, 0 ] );
+
+	}
+
+	f.svg
+		.attr("width", width + margin.left + margin.right);
 
 	// X axis
-	f.x = d3.scaleBand()
-		.range([ 0, width ])
-		.domain(f.tab.sort( (a,b) => b.players-a.players ).map( d => d.name ))
+	f.x.range([ 0, width ])
 		.padding(0.2);
-	svg.append("g")
-		.attr("transform", `translate(0,${height})`)
-		.call(d3.axisBottom(f.x));
+	f.xaxis
+		.attr("transform", `translate(0,${height})`);
 
-	// Y axis
-	f.y = d3.scaleLinear()
-		.range( [ height, 0 ] )
-		.domain( [ 0, d3.max(f.tab, d => d.players) ]);
-	svg.append("g")
-		.call(d3.axisLeft(f.y));
+	// update x axis
+	f.x.domain(f.tab.sort( (a,b) => b.val - a.val ).map( d => d.name ));
+	f.xaxis.call(d3.axisBottom(f.x));
 
-	// bars
+	// update y axis
+	f.y.domain([ 0, d3.max(f.tab, d => d.val) ]);
+	f.yaxis.call(d3.axisLeft(f.y));
 	
-	var u = svg.selectAll("rect")
+	// bars
+	var u = f.svg.selectAll("rect")
 		.data(f.tab);
+
 	u.join(enter => {
 		enter.append("rect")
-		.attr("x", d => f.x(d.name))
-		.attr("y", d => f.y(d.players))
-		.attr("width", f.x.bandwidth())
-		.attr("height", d => height - f.y(d.players))
-		.attr("fill", "green")
+			.attr("x", d => f.x(d.name))
+			.attr("y", d => f.y(d.val))
+			.attr("width", f.x.bandwidth())
+			.attr("height", d => height - f.y(d.val))
+			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
+			.attr("data-id", d => d.id);
+	}, update => {
+		update
+			.attr("x", d => f.x(d.name))
+			.attr("y", d => f.y(d.val))
+			.attr("width", f.x.bandwidth())
+			.attr("height", d => height - f.y(d.val))
+			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
+			.attr("data-id", d => d.id);
+	}, exit => {
+		exit.remove();
+	});
+
+	f.svg.selectAll("rect").on("click", (e) => {
+		var id = e.target.dataset.id;
+		if(f.sels.has(id))
+			f.sels.delete(id);
+		else
+			f.sels.add(id);
+
+		d3.select(e.target).attr("fill", f.sels.has(id) ? 'red' : 'green');
+		console.log(f.sels);
+		readalldata();
 	});
 
 }
@@ -82,10 +130,13 @@ function readalldata()	{
 
 	filters.forEach( f => {
 		
-		var pr1 = readidnames(f);
-		var pr2 = readdata(f);
+		var prom = [];
+		if(Object.keys(f.idname).length === 0)
+			prom.push(readidnames(f));
 
-		pr.push(Promise.all( [ pr1, pr2 ] )
+		prom.push(readdata(f));
+
+		pr.push(Promise.all( prom )
 		.then( () => {
 
 			f.tab.forEach( t => {
@@ -95,7 +146,7 @@ function readalldata()	{
 
 			});
 
-			console.log('all', f);
+			setvals(f);
 
 			if(f.drawer)
 				f.drawer(f);
@@ -108,6 +159,15 @@ function readalldata()	{
 	.then( () => {
 
 		console.log('ready to draw graph');
+
+		d3.selectAll("#infodiv input").on("change", () => filters.forEach( f => {
+
+			setvals(f);
+
+			if(f.drawer)
+				f.drawer(f);
+
+		}));
 
 	});
 
@@ -137,11 +197,11 @@ function readdata(f)	{
 
 	var req = makereqstr(f);
 
-	console.log("api/gettsv.php?f=getdata" + req);
 	return fetch("api/gettsv.php?f=getdata" + req)
 	.then( res => res.text() )
 	.then( res => {
 
+		f.tab = [];
 		res.split('\n').forEach( s => {
 
 			if(s.length === 0)
@@ -157,8 +217,6 @@ function readdata(f)	{
 
 		});
 
-		console.log('rd', f);
-
 	});
 
 }
@@ -171,7 +229,7 @@ function makereqstr(filt)	{
 		if(f === filt)
 			return;		// skip same graph
 
-		req += `&${f.name}=${f.sels.join(',')}`;
+		req += `&${f.name}=${Array.from(f.sels).join(',')}`;
 
 	});
 
