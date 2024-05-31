@@ -78,11 +78,17 @@ function barchart(f)	{
 
 	// update x axis
 	f.x.domain(f.tab.sort( (a,b) => b.val - a.val ).map( d => d.name ));
-	f.xaxis.call(d3.axisBottom(f.x));
+	f.xaxis
+		.transition()
+		.duration(700)
+		.call(d3.axisBottom(f.x));
 
 	// update y axis
 	f.y.domain([ 0, d3.max(f.tab, d => d.val) ]);
-	f.yaxis.call(d3.axisLeft(f.y));
+	f.yaxis
+		.transition()
+		.duration(700)
+		.call(d3.axisLeft(f.y));
 	
 	// bars
 	var u = f.svg.selectAll("rect")
@@ -90,15 +96,20 @@ function barchart(f)	{
 
 	u.join(enter => {
 		enter.append("rect")
+			.transition()
+	//		.duration(100)
 			.attr("x", d => f.x(d.name))
 			.attr("y", d => f.y(d.val))
 			.attr("width", f.x.bandwidth())
 			.attr("height", d => height - f.y(d.val))
 			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
 			.attr("data-id", d => d.id)
-			.append("title").text(d => d.title + '\n' + d.players);
+			.delay( (d,i) => i*30 );
+		enter.append("title").text(d => d.title + '\n' + d.players);
 	}, update => {
 		update
+			.transition()
+			.duration(700)
 			.attr("x", d => f.x(d.name))
 			.attr("y", d => f.y(d.val))
 			.attr("width", f.x.bandwidth())
@@ -107,8 +118,13 @@ function barchart(f)	{
 			.attr("data-id", d => d.id);
 		update.select("title").text( d => d.title + '\n' + d.players);
 	}, exit => {
-		exit.remove();
+		exit
+			.transition()
+			.duration(700)
+			.remove();
 	});
+	//	.transition()
+	//	.duration(2000);
 
 	function select(id)	{
 
@@ -198,7 +214,7 @@ function listfilters()	{
 
 		Array.from(f.sels).forEach( id => {
 
-			span.append("span").text( f.idname[id][0] );
+			span.append("span").attr("title", f.idname[id][1]).text( f.idname[id][0] );
 
 		});
 
