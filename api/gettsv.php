@@ -22,13 +22,34 @@ if( substr( $_GET['f'], 0, 3) == 'get' )
 //  usage: GET api/gettsv.php?f=func&par=parameters
 /////////
 
-function getgamenames()	{
+function _getgamenames()	{
 
 	global $db;
 
 	echo implode(pg_copy_to($db, "(
 		
 		select titleid,name from hourlytotals
+
+	)", chr(9)));
+
+}
+
+function getcatalog()	{
+
+	global $db;
+
+	$select = array(
+		"country" => "countryid,country,name from hourlytab join countries using(countryid)",
+		"lang" => "langid,lang,name from hourlytab join languages using(langid)",
+		"genre" => "genreid,genre,genre from genres join gamegenres using(genreid) join hourlytab using(titleid)",
+		"game" => "titleid,name,'' from games join hourlytab using(titleid)"
+	);
+
+	$sel = $select[$_GET['cat']];
+
+	echo implode(pg_copy_to($db, "(
+
+		select distinct $sel
 
 	)", chr(9)));
 
