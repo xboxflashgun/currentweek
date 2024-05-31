@@ -52,8 +52,6 @@ function barchart(f)	{
 		width = f.tab.length * 20 + 90 - margin.left - margin.right,
 		height = div.node().clientHeight - margin.top - margin.bottom;
 
-	console.log(f);
-
 	if( ! f.svg )	{
 
 		f.svg = div.append("svg")
@@ -97,7 +95,8 @@ function barchart(f)	{
 			.attr("width", f.x.bandwidth())
 			.attr("height", d => height - f.y(d.val))
 			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
-			.attr("data-id", d => d.id);
+			.attr("data-id", d => d.id)
+			.append("title").text(d => d.title + '\n' + d.players);
 	}, update => {
 		update
 			.attr("x", d => f.x(d.name))
@@ -106,6 +105,7 @@ function barchart(f)	{
 			.attr("height", d => height - f.y(d.val))
 			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
 			.attr("data-id", d => d.id);
+		update.select("title").text( d => d.title + '\n' + d.players);
 	}, exit => {
 		exit.remove();
 	});
@@ -181,6 +181,26 @@ function readalldata()	{
 				f.drawer(f);
 
 		}));
+		
+		listfilters();
+
+
+	});
+
+}
+
+function listfilters()	{
+
+	var span = d3.select("#filterdiv span");
+	span.selectAll("*").remove();
+
+	filters.forEach( f => {
+
+		Array.from(f.sels).forEach( id => {
+
+			span.append("span").text( f.idname[id][0] );
+
+		});
 
 	});
 
