@@ -69,7 +69,7 @@ function barchart(f)	{
 
 	}
 
-	f.svg
+	d3.select(f.svg.node().parentNode)
 		.attr("width", width + margin.left + margin.right);
 
 	// X axis
@@ -110,16 +110,29 @@ function barchart(f)	{
 		exit.remove();
 	});
 
-	f.svg.selectAll("rect").on("click", (e) => {
-		var id = e.target.dataset.id;
+	function select(id)	{
+
 		if(f.sels.has(id))
 			f.sels.delete(id);
 		else
 			f.sels.add(id);
 
-		d3.select(e.target).attr("fill", f.sels.has(id) ? 'red' : 'green');
-		console.log(f.sels);
 		readalldata();
+
+	}
+
+
+	f.svg.selectAll("text").on("click", (e) => {
+		var name = d3.select(e.target).text();
+		var id = Object.keys(f.idname).filter( d => f.idname[d][0] === name )[0];
+		select(id);
+		d3.select(e.target).attr("color", f.sels.has(id) ? '#fff' : null);
+	});
+
+	f.svg.selectAll("rect").on("click", (e) => {
+		var id = e.target.dataset.id;
+		select(id);
+		d3.select(e.target).attr("fill", f.sels.has(id) ? 'red' : 'green');
 	});
 
 }

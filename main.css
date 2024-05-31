@@ -54,3 +54,7 @@ body {
 	overflow-x: scroll;
 	overflow-y: hidden;
 }
+
+.svg rect,text	{
+	cursor: pointer;
+}
