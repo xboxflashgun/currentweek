@@ -22,27 +22,15 @@ if( substr( $_GET['f'], 0, 3) == 'get' )
 //  usage: GET api/gettsv.php?f=func&par=parameters
 /////////
 
-function _getgamenames()	{
-
-	global $db;
-
-	echo implode(pg_copy_to($db, "(
-		
-		select titleid,name from hourlytotals
-
-	)", chr(9)));
-
-}
-
 function getcatalog()	{
 
 	global $db;
 
 	$select = array(
-		"country" => "countryid,country,name from hourlytab join countries using(countryid)",
-		"lang" => "langid,lang,name from hourlytab join languages using(langid)",
-		"genre" => "genreid,genre,genre from genres join gamegenres using(genreid) join hourlytab using(titleid)",
-		"game" => "titleid,name,'' from games join hourlytab using(titleid)"
+		"country" => "countryid,country,name from weeklytotals join countries using(countryid)",
+		"lang" => "langid,lang,name from weeklytotals join languages using(langid)",
+		"genre" => "genreid,genre,genre from genres join gamegenres using(genreid) join weeklytotals using(titleid)",
+		"game" => "titleid,name,'' from games join weeklytotals using(titleid)"
 	);
 
 	$sel = $select[$_GET['cat']];
@@ -60,7 +48,7 @@ function getdata()	{
 	global $db;
 
 	$select = '';
-	$where = 'utime is null';
+	$where = 'true';
 	$group = '';
 	$join = '';
 
@@ -105,7 +93,7 @@ function getdata()	{
 
 	error_log("
 		select $select
-		from hourlytab
+		from weeklytotals
 		$join
 		where $where
 		$group
@@ -117,7 +105,7 @@ function getdata()	{
 	echo implode(pg_copy_to($db, "(
 
 		select $select
-		from hourlytab
+		from weeklytotals
 		$join
 		where $where
 		$group
