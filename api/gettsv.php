@@ -49,7 +49,6 @@ function getdata()	{
 
 	$select = '';
 	$where = 'true';
-	$group = '';
 	$join = '';
 
 	if(isset($_GET['country']))
@@ -58,7 +57,7 @@ function getdata()	{
 		else
 			$where .= " and countryid is null";
 	else
-		$select = "countryid,players";
+		$select = "countryid";
 
 
 	if(isset($_GET['lang']))
@@ -67,7 +66,7 @@ function getdata()	{
 		else
 			$where .= " and langid is null";
 	else
-		$select = "langid,players";
+		$select = "langid";
 
 	if(isset($_GET['game']))
 		if(strlen($_GET['game']) > 0)
@@ -75,7 +74,7 @@ function getdata()	{
 		else
 			;
 	else
-		$select = "titleid,players";
+		$select = "titleid";
 
 	if(isset($_GET['genre']))
 		if(strlen($_GET['genre']) > 0)
@@ -83,33 +82,27 @@ function getdata()	{
 		else
 			;
 	else	{
-		$select = "genreid,sum(players)";
+		$select = "genreid";
 		$join = "join gamegenres using(titleid)";
-		$group = "group by genreid";
 	}
 
 	if( isset($_GET['game']) && isset($_GET['genre']) && strlen($_GET['genre']) == 0 && strlen($_GET['game']) == 0 )
 		$where .= " and titleid is null";
 
-	error_log("
-		select $select
+	$req = "
+		select $select,sum(players)
 		from weeklytotals
 		$join
 		where $where
-		$group
+		group by 1
 		limit 300
-	");
+	";
 
 
 
 	echo implode(pg_copy_to($db, "(
 
-		select $select
-		from weeklytotals
-		$join
-		where $where
-		$group
-		limit 300
+		$req
 
 	)", chr(9)));
 

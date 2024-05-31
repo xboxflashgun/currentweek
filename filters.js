@@ -202,6 +202,8 @@ function readdata(f)	{
 	.then( res => {
 
 		f.tab = [];
+		f.ref = 0;
+
 		res.split('\n').forEach( s => {
 
 			if(s.length === 0)
