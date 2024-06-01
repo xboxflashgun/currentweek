@@ -65,8 +65,7 @@ function gametab(f)	{
 		row.append("td").text( d => d.name);
 		row.append("td").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
 	}, update => {
-		update.select("tr")
-			.attr("data-id", d => d.id);
+		update.attr("data-id", d => d.id);
 		update.select("td:nth-child(1)").text(d => d.name);
 		update.select("td:nth-child(2)").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
 	}, exit => {
