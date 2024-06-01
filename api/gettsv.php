@@ -85,6 +85,9 @@ function getdata()	{
 	else	{
 		$select = "genreid";
 		$join = "join gamegenres using(titleid)";
+	}
+
+	if(!isset($_GET['game']) || !isset($_GET['genre']))
 		$union = "
 			union
 			select null::smallint,sum(players)
@@ -93,7 +96,6 @@ function getdata()	{
 			where $where
 			group by 1
 		";
-	}
 
 	if( isset($_GET['game']) && isset($_GET['genre']) && strlen($_GET['genre']) == 0 && strlen($_GET['game']) == 0 )
 		$where .= " and titleid is null";
@@ -105,10 +107,9 @@ function getdata()	{
 		where $where
 		group by 1
 		$union
---		order by 1 nulls first
 	";
 
-	# error_log($req);
+	error_log($req);
 
 	echo implode(pg_copy_to($db, "(
 

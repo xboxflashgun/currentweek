@@ -62,10 +62,10 @@ function gametab(f)	{
 	.join( enter => {
 		var row = enter.append("tr");
 		row.append("td").text( d => d.name);
-		row.append("td").text( d => d.val);
+		row.append("td").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
 	}, update => {
 		update.select("td:nth-child(1)").text(d => d.name);
-		update.select("td:nth-child(2)").text(d => d.val);
+		update.select("td:nth-child(2)").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
 	}, exit => {
 		exit.remove();
 	});
