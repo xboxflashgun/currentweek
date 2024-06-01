@@ -120,3 +120,80 @@ function getdata()	{
 }
 
 
+function gettimegraph()	{
+
+	global $db;
+
+	$select = '';
+	$where = 'true';
+	$join = '';
+	$union = '';
+
+	if(isset($_GddET['country']))
+		if(strlen($_GET['country']) > 0)
+			$where .= " and countryid=any(array[" . $_GET['country'] . "])";
+		else
+			$where .= " and countryid is null";
+	else
+		$select = "countryid";
+
+
+	if(isset($_GET['lang']))
+		if(strlen($_GET['lang']) > 0)
+			$where .= " and langid=any(array[" . $_GET['lang'] . "])";
+		else
+			$where .= " and langid is null";
+	else
+		$select = "langid";
+
+	if(isset($_GET['game']))
+		if(strlen($_GET['game']) > 0)
+			$where .= " and titleid=any(array[" . $_GET['game']. "])";
+		else
+			;
+	else
+		$select = "titleid";
+
+	if(isset($_GET['genre']))
+		if(strlen($_GET['genre']) > 0)
+			$where .= " and titleid=any(select titleid from gamegenres where genreid=any(array[" . $_GET['genre'] . "]))";
+		else
+			;
+	else	{
+		$select = "genreid";
+		$join = "join gamegenres using(titleid)";
+	}
+
+	if(!isset($_GET['game']) || !isset($_GET['genre']))
+		$union = "
+			union
+			select null::smallint,sum(players)
+			from weeklytotals
+			$join
+			where $where
+			group by 1
+		";
+
+	if( isset($_GET['game']) && isset($_GET['genre']) && strlen($_GET['genre']) == 0 && strlen($_GET['game']) == 0 )
+		$where .= " and titleid is null";
+
+	$req = "
+		select $select,sum(players)
+		from weeklytotals
+		$join
+		where $where
+		group by 1
+		$union
+	";
+
+	error_log($req);
+
+	echo implode(pg_copy_to($db, "(
+
+		$req
+
+	)", chr(9)));
+
+}
+
+

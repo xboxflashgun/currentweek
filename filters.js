@@ -2,6 +2,9 @@
 
 var filters = [
 	{
+		name: "info",
+	},
+	{
 		name: "country",		// request + divname
 		sels: new Set(),			// selection list
 		tab: [],			// data: { id: ..., name: ..., players: ..., title: ..., val: ...
@@ -31,10 +34,12 @@ var filters = [
 		idname: {}, 
 		drawer: gametab,
 		stater: horstat,
-	}
+	},
 ];
 
 var percflag;		// true if percentage scale
+
+var graph = filters[0];		// default - all players
 
 function horstat(f)	{
 	
@@ -320,6 +325,9 @@ function readalldata()	{
 
 	filters.forEach( f => {
 		
+		if( ! f.tab )
+			return;			// skip info panel
+
 		var prom = [];
 		if(Object.keys(f.idname).length === 0)
 			prom.push(readidnames(f));
@@ -361,6 +369,8 @@ function readalldata()	{
 		
 		listfilters();
 
+		timegraph();
+
 	});
 
 }
@@ -371,6 +381,9 @@ function listfilters()	{
 	span.selectAll("*").remove();
 
 	filters.forEach( f => {
+
+		if( ! f.tab )
+			return;		// skip info panel
 
 		var sp = span.append("span");
 
@@ -453,7 +466,7 @@ function makereqstr(filt)	{
 	var req = '';
 	filters.forEach( f => {
 
-		if(f === filt)
+		if(f === filt || !f.tab)
 			return;		// skip same graph
 
 		req += `&${f.name}=${Array.from(f.sels).join(',')}`;

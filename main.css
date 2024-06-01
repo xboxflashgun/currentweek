@@ -99,6 +99,7 @@ body {
 #infodiv table {
 	border: 0px;
 	border-collapse: collapse;
+	font-size: 12px;
 }
 
 #infodiv td:nth-child(2)	{
