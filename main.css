@@ -91,3 +91,19 @@ body {
 #gametab td:nth-child(2)	{
 	text-align: right;
 }
+
+.box	{
+	float: left;
+}
+
+#infodiv table {
+	border: 0px;
+	border-collapse: collapse;
+}
+
+#infodiv td:nth-child(2)	{
+	text-align: right;
+	color: #ddd;
+}
+
+

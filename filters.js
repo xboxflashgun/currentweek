@@ -7,6 +7,7 @@ var filters = [
 		tab: [],			// data: { id: ..., name: ..., players: ..., title: ..., val: ...
 		idname: {},			// idname[id] = name
 		drawer: barchart,
+		stater: horstat,
 	},
 	{
 		name: "lang",
@@ -14,6 +15,7 @@ var filters = [
 		tab: [],
 		idname: {},
 		drawer: barchart,
+		stater: horstat,
 	},
 	{
 		name: "genre",
@@ -28,10 +30,19 @@ var filters = [
 		tab: [],
 		idname: {}, 
 		drawer: gametab,
+		stater: horstat,
 	}
 ];
 
 var percflag;		// true if percentage scale
+
+function horstat(f)	{
+	
+	d3.select(`#${f.name}stat`).text(f.tab.length);
+	if(f.name === 'country')
+		d3.select("#gamersstat").text(f.ref);
+
+}
 
 // set value: absolute/percentage
 function setvals(f)	{
@@ -429,6 +440,9 @@ function readdata(f)	{
 				f.tab.push( {id: id, players: players} );
 
 		});
+
+		if(f.stater)
+			f.stater(f);
 
 	});
 
