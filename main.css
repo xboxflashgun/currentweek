@@ -51,8 +51,6 @@ body {
 .svg	{
 	width: 100%;
 	height: 100%;
-	overflow-x: scroll;
-	overflow-y: hidden;
 }
 
 .svg rect,text	{
@@ -68,4 +66,15 @@ body {
 	font-size: 12px;
 	cursor: pointer;
 }
+
+.horscroll	{
+	overflow-x: scroll;
+	overflow-y: hidden;
+}
+
+.verscroll	{
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
 

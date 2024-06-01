@@ -50,12 +50,44 @@ function horizbar(f)	{
 
 	console.log(f);
 
+	var div = d3.select(`#${f.name}div .svg`).classed("verscroll", true);
+
+	var margin = { top: 20, right: 30, bottom: 40, left: 60 },
+		width = div.node().clientWidth - margin.left - margin.right,
+		height = f.tab.length * 20 - margin.top - margin.bottom;
+
+	if( ! f.svg )	{
+
+		f.svg = div.append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.append("g")
+				.attr("transform", `translate(${margin.left},${margin.top})`);
+
+		f.x = d3.scaleLinear()
+			.range([ 0, width]);
+		f.xaxis = f.svg.append("g");
+
+		f.y = d3.scaleBand()
+			.padding(.1);
+		f.yaxis = f.svg.append("g");
+
+	}
+
+	d3.select(f.svg.node().parentNode)
+		.attr("height", height + margin.top + margin.bottom);
+
+	// X axis
+	f.x.domain([ 0, d3.max(f.tab, d => d.val) ]);
+	f.xaxis
+		.attr("transform", `translate(0,${height})`)
+		.call(d3.axisBottom(f.x));
+
 }
 
 // barchart for country and language
 function barchart(f)	{
 
-	var div = d3.select(`#${f.name}div .svg`);
+	var div = d3.select(`#${f.name}div .svg`).classed("horscroll", true);
 
 	var margin = { top: 20, right: 30, bottom: 40, left: 60 },
 		width = f.tab.length * 20 + 90 - margin.left - margin.right,
@@ -70,9 +102,9 @@ function barchart(f)	{
 		f.x = d3.scaleBand();
 		f.xaxis = f.svg.append("g");
 
-		f.y = d3.scaleLinear();
+		f.y = d3.scaleLinear()
+			.range( [ height, 0 ] );
 		f.yaxis = f.svg.append("g");
-		f.y.range( [ height, 0 ] );
 
 	}
 
@@ -104,21 +136,18 @@ function barchart(f)	{
 	var u = f.svg.selectAll("rect")
 		.data(f.tab);
 
+	console.log(f);
 	u.join(enter => {
 		enter.append("rect")
-			.transition()
 			.attr("x", d => f.x(d.name))
 			.attr("y", d => f.y(d.val))
 			.attr("width", f.x.bandwidth())
 			.attr("height", d => height - f.y(d.val))
 			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
 			.attr("data-id", d => d.id)
-			.delay( (d,i) => i*30 );
-		enter.append("title").text(d => d.title + '\n' + d.players);
+			.append("title").text(d => d.title + '\n' + d.players);
 	}, update => {
 		update
-			.transition()
-			.duration(700)
 			.attr("x", d => f.x(d.name))
 			.attr("y", d => f.y(d.val))
 			.attr("width", f.x.bandwidth())
