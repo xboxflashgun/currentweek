@@ -79,6 +79,10 @@ body {
 	font-size: 10px;
 }
 
+#gametab tr {
+	cursor: pointer;
+}
+
 #gametab td:nth-child(2)	{
 	text-align: right;
 }

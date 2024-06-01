@@ -61,16 +61,29 @@ function gametab(f)	{
 	.data(f.tab.sort( (a,b) => b.val - a.val))
 	.join( enter => {
 		var row = enter.append("tr");
+		row.attr("data-id", d => d.id);
 		row.append("td").text( d => d.name);
 		row.append("td").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
 	}, update => {
+		update.select("tr")
+			.attr("data-id", d => d.id);
 		update.select("td:nth-child(1)").text(d => d.name);
 		update.select("td:nth-child(2)").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
 	}, exit => {
 		exit.remove();
 	});
 
+	// mark rows
+	tab.selectAll("tr").style('color', null);
+	Array.from(f.sels).forEach( id => {
+		tab.select(`tr[data-id="${id}"]`).style('color', '#fff');
+	});
 
+	tab.selectAll("tr").on('click', e => {
+		select(f, e.target.parentNode.dataset.id);
+		console.log(e.target.parentNode.dataset.id, f.sels.has(e.target.parentNode.dataset.id));
+		d3.select(e.target.parentNode).style('color', f.sels.has(e.target.parentNode.dataset.id) ? '#fff' : null);
+	});
 
 }
 
@@ -279,7 +292,6 @@ function barchart(f)	{
 
 		var par = e.target.parentNode;
 		par.scrollTo( { left: par.scrollLeft - e.wheelDeltaY, behavior: 'smooth' } );
-		console.log(e, par.scrollLeft);
 
 	});
 
