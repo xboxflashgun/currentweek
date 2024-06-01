@@ -101,10 +101,7 @@ function horizbar(f)	{
 
 	var margin = { top: 10, right: 30, bottom: 60, left: 20 },
 		width = div.node().clientWidth - margin.left - margin.right,
-		height = f.tab.length * 18 - margin.top - margin.bottom;
-
-	if(height < 200)
-		height = 200;
+		height = f.tab.length * 14;	// - margin.top - margin.bottom;
 
 	if( ! f.svg )	{
 
@@ -142,8 +139,6 @@ function horizbar(f)	{
 		.range( [0, height ] );
 	f.yaxis
 		.call(d3.axisRight(f.y));
-
-	console.log(f, height);
 
 	f.svg.selectAll("rect")
 		.data(f.tab)

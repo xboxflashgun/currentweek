@@ -79,6 +79,11 @@ body {
 	font-size: 10px;
 }
 
+#gametab table {
+	border: 0px;
+	border-collapse: collapse;
+}
+
 #gametab tr {
 	cursor: pointer;
 }
