@@ -275,6 +275,14 @@ function barchart(f)	{
 			Object.keys(f.idname).filter(e => f.idname[e][0] === d)[0] ))
 		.attr("color", "#fff");
 
+	div.on("wheel", (e) => {
+
+		var par = e.target.parentNode;
+		par.scrollTo( { left: par.scrollLeft - e.wheelDeltaY, behavior: 'smooth' } );
+		console.log(e, par.scrollLeft);
+
+	});
+
 }
 
 function readalldata()	{

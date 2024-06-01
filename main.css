@@ -10,22 +10,20 @@ body {
 #col1	{
 	width: 1148px;
 	height: 300px;
-	background-color: #115;
 	float: left;
 }
 
 #gamesdiv	{
 	width: 288px;
-	height: 900px;
-	background-color: #232;
+	height: 900px; 
 	float: left;
+	overflow-y: scroll;
 }
 
 #infodiv,#countrydiv,#langdiv,#genrediv	{
 	width: 287px;
 	height: 299px;
 	float: left;
-	background-color: #113;
 }
 
 .boxheader	{
@@ -77,4 +75,10 @@ body {
 	overflow-y: scroll;
 }
 
+#gametab {
+	font-size: 10px;
+}
 
+#gametab td:nth-child(2)	{
+	text-align: right;
+}
