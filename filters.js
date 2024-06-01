@@ -20,6 +20,7 @@ var filters = [
 		sels: new Set(),
 		tab: [],
 		idname: {},
+		drawer: horizbar,
 	},
 	{
 		name: "game",
@@ -29,19 +30,27 @@ var filters = [
 	}
 ];
 
+var percflag;		// true if percentage scale
+
 // set value: absolute/percentage
 function setvals(f)	{
 
 	if(f.ref)	{
 
-		var percflag = d3.select('#infodiv input[value="perc"]').property("checked");
+		percflag = d3.select('#infodiv input[value="perc"]').property("checked");
 
-		f.tab.forEach( t => t.val = (percflag) ? 100. * t.players/f.ref : t.players );
+		f.tab.forEach( t => t.val = (percflag) ? 1. * t.players/f.ref : t.players );
 
 	}
 
 }
 
+// horizontal bar chart for genres
+function horizbar(f)	{
+
+	console.log(f);
+
+}
 
 // barchart for country and language
 function barchart(f)	{
@@ -78,6 +87,7 @@ function barchart(f)	{
 
 	// update x axis
 	f.x.domain(f.tab.sort( (a,b) => b.val - a.val ).map( d => d.name ));
+	// f.xaxis.tickFormat(d3.format( percflag ? "%" : ""));
 	f.xaxis
 		.transition()
 		.duration(700)
@@ -88,7 +98,7 @@ function barchart(f)	{
 	f.yaxis
 		.transition()
 		.duration(700)
-		.call(d3.axisLeft(f.y));
+		.call(d3.axisLeft(f.y).tickFormat(d3.format( percflag ? ".0%" : ".0s")));
 	
 	// bars
 	var u = f.svg.selectAll("rect")
