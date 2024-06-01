@@ -56,9 +56,20 @@ function gametab(f)	{
 	}
 
 	var tab = f.div.select("table");
+	var str = d3.select(`#${f.name}div input`).property("value").toLowerCase();
+	var fff;	// filter function
+
+	if(str.length > 0)
+		fff = a => a.toLowerCase().indexOf(str) >= 0;
+	else
+		fff = a => true;
+
+	console.log(str);
 
 	tab.selectAll("tr")
-	.data(f.tab.sort( (a,b) => b.val - a.val))
+	.data(f.tab
+		.filter(d => fff(d.name))
+		.sort( (a,b) => b.val - a.val))
 	.join( enter => {
 		var row = enter.append("tr");
 		row.attr("data-id", d => d.id);
@@ -83,6 +94,8 @@ function gametab(f)	{
 		console.log(e.target.parentNode.dataset.id, f.sels.has(e.target.parentNode.dataset.id));
 		d3.select(e.target.parentNode).style('color', f.sels.has(e.target.parentNode.dataset.id) ? '#fff' : null);
 	});
+
+	d3.select(`#${f.name}div input`).on( 'input', () => gametab(f) );
 
 }
 
