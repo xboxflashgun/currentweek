@@ -50,9 +50,9 @@ function horizbar(f)	{
 
 	var div = d3.select(`#${f.name}div .svg`).classed("verscroll", true);
 
-	var margin = { top: 20, right: 30, bottom: 40, left: 60 },
+	var margin = { top: 20, right: 30, bottom: 60, left: 20 },
 		width = div.node().clientWidth - margin.left - margin.right,
-		height = f.tab.length * 20 - margin.top - margin.bottom;
+		height = f.tab.length * 18 - margin.top - margin.bottom;
 
 	if( ! f.svg )	{
 
@@ -65,8 +65,7 @@ function horizbar(f)	{
 			.range([ 0, width]);
 		f.xaxis = f.svg.append("g");
 
-		f.y = d3.scaleBand()
-			.padding(.1);
+		f.y = d3.scaleBand();
 		f.yaxis = f.svg.append("g");
 
 	}
@@ -78,16 +77,72 @@ function horizbar(f)	{
 	f.x.domain([ 0, d3.max(f.tab, d => d.val) ]);
 	f.xaxis
 		.attr("transform", `translate(0,${height})`)
-		.call(d3.axisBottom(f.x));
+		.call(d3.axisBottom(f.x).tickFormat(d3.format( percflag ? ".0%" : ".0s")))
+		.selectAll("text")
+		.attr("transform", "translate(-10,0)rotate(-45)")
+		.style("text-anchor", "end")
+		.style("cursor", "default");
 
 	// y axis
-	f.y.domain(f.tab.sort( (a,b) => b.val - a.val ).map( d => d.name ));
+	f.y
+		.domain(f.tab.sort( (a,b) => b.val - a.val ).map( d => d.name ))
+		.range( [0, height ] );
 	f.yaxis
-		.call(d3.axisLeft(f.x));
+		.call(d3.axisRight(f.y));
 
-	console.log(f);
+	var u = f.svg.selectAll("rect")
+		.data(f.tab);
+
+	u.join(enter => {
+		enter.append("rect")
+			.attr("x", f.x(0))
+			.attr("y", d => f.y(d.name))
+			.attr("width", d => f.x(d.val))
+			.attr("height", f.y.bandwidth())
+			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
+			.attr("data-id", d => d.id)
+			.style("opacity", 0.5);
+	}, update => {
+		update
+			.attr("x", f.x(0))
+			.attr("y", d => f.y(d.name))
+			.attr("width", d => f.x(d.val))
+			.attr("height", f.y.bandwidth())
+			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
+			.attr("data-id", d => d.id)
+			.style("opacity", 0.5);
+	}, exit => {
+		exit.remove();
+	});
+
+	f.svg.selectAll("rect").on("click", (e) => {
+		var id = e.target.dataset.id;
+		select(f, id);
+		d3.select(e.target).attr("fill", f.sels.has(id) ? 'red' : 'green');
+	});
+
+	f.svg.selectAll("text").on("click", (e) => {
+		var name = d3.select(e.target).text();
+		var id = Object.keys(f.idname).filter( d => f.idname[d][0] === name )[0];
+		if( ! id )
+			return;
+		select(f, id);
+		d3.select(e.target).attr("color", f.sels.has(id) ? '#fff' : null);
+	});
 
 }
+
+function select(f, id)	{
+
+	if(f.sels.has(id))
+		f.sels.delete(id);
+	else
+		f.sels.add(id);
+
+	readalldata();
+
+}
+
 
 // barchart for country and language
 function barchart(f)	{
@@ -165,28 +220,16 @@ function barchart(f)	{
 			.remove();
 	});
 
-	function select(id)	{
-
-		if(f.sels.has(id))
-			f.sels.delete(id);
-		else
-			f.sels.add(id);
-
-		readalldata();
-
-	}
-
-
 	f.svg.selectAll("text").on("click", (e) => {
 		var name = d3.select(e.target).text();
 		var id = Object.keys(f.idname).filter( d => f.idname[d][0] === name )[0];
-		select(id);
+		select(f, id);
 		d3.select(e.target).attr("color", f.sels.has(id) ? '#fff' : null);
 	});
 
 	f.svg.selectAll("rect").on("click", (e) => {
 		var id = e.target.dataset.id;
-		select(id);
+		select(f, id);
 		d3.select(e.target).attr("fill", f.sels.has(id) ? 'red' : 'green');
 	});
 
@@ -245,8 +288,6 @@ function readalldata()	{
 		}));
 		
 		listfilters();
-
-		console.log(filters);
 
 	});
 
