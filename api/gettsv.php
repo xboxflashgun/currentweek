@@ -105,8 +105,7 @@ function getdata()	{
 		where $where
 		group by 1
 		$union
-		order by 1 nulls first
-		limit 300
+--		order by 1 nulls first
 	";
 
 	# error_log($req);

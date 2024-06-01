@@ -50,6 +50,28 @@ function gametab(f)	{
 
 	console.log(f);
 
+	if( ! f.div )	{
+		f.div = d3.select("#gametab");
+		f.div.append("table");
+	}
+
+	var tab = f.div.select("table");
+
+	tab.selectAll("tr")
+	.data(f.tab.sort( (a,b) => b.val - a.val))
+	.join( enter => {
+		var row = enter.append("tr");
+		row.append("td").text( d => d.name);
+		row.append("td").text( d => d.val);
+	}, update => {
+		update.select("td:nth-child(1)").text(d => d.name);
+		update.select("td:nth-child(2)").text(d => d.val);
+	}, exit => {
+		exit.remove();
+	});
+
+
+
 }
 
 // horizontal bar chart for genres
@@ -136,6 +158,12 @@ function horizbar(f)	{
 		select(f, id);
 		d3.select(e.target).attr("color", f.sels.has(id) ? '#fff' : null);
 	});
+
+	f.svg.selectAll("text").attr("color", null);
+	f.svg.selectAll("text")
+		.filter( d => f.sels.has(
+			Object.keys(f.idname).filter(e => f.idname[e][0] === d)[0] ))
+		.attr("color", "#fff");
 
 }
 
