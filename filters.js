@@ -27,6 +27,7 @@ var filters = [
 		sels: new Set(),
 		tab: [],
 		idname: {}, 
+		drawer: gametab,
 	}
 ];
 
@@ -42,6 +43,12 @@ function setvals(f)	{
 		f.tab.forEach( t => t.val = (percflag) ? 1. * t.players/f.ref : t.players );
 
 	}
+
+}
+
+function gametab(f)	{
+
+	console.log(f);
 
 }
 

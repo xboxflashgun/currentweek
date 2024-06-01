@@ -105,10 +105,11 @@ function getdata()	{
 		where $where
 		group by 1
 		$union
+		order by 1 nulls first
 		limit 300
 	";
 
-	error_log($req);
+	# error_log($req);
 
 	echo implode(pg_copy_to($db, "(
 
