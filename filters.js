@@ -48,8 +48,6 @@ function setvals(f)	{
 
 function gametab(f)	{
 
-	console.log(f);
-
 	if( ! f.div )	{
 		f.div = d3.select("#gametab");
 		f.div.append("table");
@@ -63,8 +61,6 @@ function gametab(f)	{
 		fff = a => a.toLowerCase().indexOf(str) >= 0;
 	else
 		fff = a => true;
-
-	console.log(str);
 
 	tab.selectAll("tr")
 	.data(f.tab
@@ -91,7 +87,6 @@ function gametab(f)	{
 
 	tab.selectAll("tr").on('click', e => {
 		select(f, e.target.parentNode.dataset.id);
-		console.log(e.target.parentNode.dataset.id, f.sels.has(e.target.parentNode.dataset.id));
 		d3.select(e.target.parentNode).style('color', f.sels.has(e.target.parentNode.dataset.id) ? '#fff' : null);
 	});
 
@@ -104,9 +99,12 @@ function horizbar(f)	{
 
 	var div = d3.select(`#${f.name}div .svg`).classed("verscroll", true);
 
-	var margin = { top: 20, right: 30, bottom: 60, left: 20 },
+	var margin = { top: 10, right: 30, bottom: 60, left: 20 },
 		width = div.node().clientWidth - margin.left - margin.right,
 		height = f.tab.length * 18 - margin.top - margin.bottom;
+
+	if(height < 200)
+		height = 200;
 
 	if( ! f.svg )	{
 
@@ -119,7 +117,8 @@ function horizbar(f)	{
 			.range([ 0, width]);
 		f.xaxis = f.svg.append("g");
 
-		f.y = d3.scaleBand();
+		f.y = d3.scaleBand()
+			.padding(0.2);
 		f.yaxis = f.svg.append("g");
 
 	}
@@ -144,10 +143,11 @@ function horizbar(f)	{
 	f.yaxis
 		.call(d3.axisRight(f.y));
 
-	var u = f.svg.selectAll("rect")
-		.data(f.tab);
+	console.log(f, height);
 
-	u.join(enter => {
+	f.svg.selectAll("rect")
+		.data(f.tab)
+	.join(enter => {
 		enter.append("rect")
 			.attr("x", f.x(0))
 			.attr("y", d => f.y(d.name))
@@ -209,7 +209,7 @@ function barchart(f)	{
 
 	var div = d3.select(`#${f.name}div .svg`).classed("horscroll", true);
 
-	var margin = { top: 20, right: 30, bottom: 40, left: 60 },
+	var margin = { top: 10, right: 30, bottom: 40, left: 60 },
 		width = f.tab.length * 20 + 90 - margin.left - margin.right,
 		height = div.node().clientHeight - margin.top - margin.bottom;
 
@@ -252,10 +252,9 @@ function barchart(f)	{
 		.call(d3.axisLeft(f.y).tickFormat(d3.format( percflag ? ".0%" : ".0s")));
 	
 	// bars
-	var u = f.svg.selectAll("rect")
-		.data(f.tab);
-
-	u.join(enter => {
+	f.svg.selectAll("rect")
+	.data(f.tab)
+	.join(enter => {
 		enter.append("rect")
 			.attr("x", d => f.x(d.name))
 			.attr("y", d => f.y(d.val))
