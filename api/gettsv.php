@@ -50,6 +50,7 @@ function getdata()	{
 	$select = '';
 	$where = 'true';
 	$join = '';
+	$union = '';
 
 	if(isset($_GET['country']))
 		if(strlen($_GET['country']) > 0)
@@ -84,6 +85,14 @@ function getdata()	{
 	else	{
 		$select = "genreid";
 		$join = "join gamegenres using(titleid)";
+		$union = "
+			union
+			select null::smallint,sum(players)
+			from weeklytotals
+			$join
+			where $where
+			group by 1
+		";
 	}
 
 	if( isset($_GET['game']) && isset($_GET['genre']) && strlen($_GET['genre']) == 0 && strlen($_GET['game']) == 0 )
@@ -95,10 +104,11 @@ function getdata()	{
 		$join
 		where $where
 		group by 1
+		$union
 		limit 300
 	";
 
-
+	error_log($req);
 
 	echo implode(pg_copy_to($db, "(
 

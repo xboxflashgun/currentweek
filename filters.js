@@ -48,8 +48,6 @@ function setvals(f)	{
 // horizontal bar chart for genres
 function horizbar(f)	{
 
-	console.log(f);
-
 	var div = d3.select(`#${f.name}div .svg`).classed("verscroll", true);
 
 	var margin = { top: 20, right: 30, bottom: 40, left: 60 },
@@ -81,6 +79,13 @@ function horizbar(f)	{
 	f.xaxis
 		.attr("transform", `translate(0,${height})`)
 		.call(d3.axisBottom(f.x));
+
+	// y axis
+	f.y.domain(f.tab.sort( (a,b) => b.val - a.val ).map( d => d.name ));
+	f.yaxis
+		.call(d3.axisLeft(f.x));
+
+	console.log(f);
 
 }
 
@@ -119,7 +124,6 @@ function barchart(f)	{
 
 	// update x axis
 	f.x.domain(f.tab.sort( (a,b) => b.val - a.val ).map( d => d.name ));
-	// f.xaxis.tickFormat(d3.format( percflag ? "%" : ""));
 	f.xaxis
 		.transition()
 		.duration(700)
@@ -136,7 +140,6 @@ function barchart(f)	{
 	var u = f.svg.selectAll("rect")
 		.data(f.tab);
 
-	console.log(f);
 	u.join(enter => {
 		enter.append("rect")
 			.attr("x", d => f.x(d.name))
@@ -243,6 +246,7 @@ function readalldata()	{
 		
 		listfilters();
 
+		console.log(filters);
 
 	});
 
