@@ -39,7 +39,7 @@ var filters = [
 
 var percflag;		// true if percentage scale
 
-var graph = filters[0];		// default - all players
+var graph = filters[3];		// default - all players
 
 function horstat(f)	{
 	
@@ -355,8 +355,6 @@ function readalldata()	{
 
 	Promise.all( pr )
 	.then( () => {
-
-		console.log('ready to draw graph');
 
 		d3.selectAll("#infodiv input").on("change", () => filters.forEach( f => {
 
