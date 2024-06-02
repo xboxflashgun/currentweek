@@ -170,6 +170,7 @@ function gettimegraph()	{
 		$join
 		where $where $subreq
 		group by 1,2
+		order by 1
 	";
 
 #	error_log($req);

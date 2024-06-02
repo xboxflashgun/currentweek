@@ -39,8 +39,6 @@ var filters = [
 
 var percflag;		// true if percentage scale
 
-var graph = filters[3];		// default - all players
-
 function horstat(f)	{
 	
 	d3.select(`#${f.name}stat`).text(f.tab.length);
@@ -367,7 +365,7 @@ function readalldata()	{
 		
 		listfilters();
 
-		timegraph();
+		timegraph(filters[3]);
 
 	});
 
