@@ -43,7 +43,7 @@ var filters = [
 	}
 ];
 
-var percflag;		// true if percentage scale
+var percflag = true;		// true if percentage scale
 
 function horstat(f)	{
 	
@@ -56,13 +56,11 @@ function horstat(f)	{
 // set value: absolute/percentage
 function setvals(f)	{
 
-	if(f.ref)	{
-
-		percflag = d3.select('#infodiv input[value="perc"]').property("checked");
-
+	if(f.ref)
 		f.tab.forEach( t => t.val = (percflag) ? 1. * t.players/f.ref : t.players );
-
-	}
+	
+	if(f.name === 'graph')
+		data.forEach( d => d.val = (percflag) ? 1. * d.players/ref[d.utime] : d.players );
 
 }
 
@@ -360,15 +358,20 @@ function readalldata()	{
 	Promise.all( pr )
 	.then( () => {
 
-		d3.selectAll("#infodiv input").on("change", () => filters.forEach( f => {
+		d3.selectAll("#infodiv input").on("change", () => {
 
-			setvals(f);
+			percflag = d3.select('#infodiv input[value="perc"]').property("checked");
+			filters.forEach( f => {
 
-			if(f.drawer)
-				f.drawer(f);
+				setvals(f);
 
-		}));
-		
+				if(f.drawer)
+					f.drawer(f);
+
+			})
+
+		});
+
 		listfilters();
 
 		timegraph(filters[3]);

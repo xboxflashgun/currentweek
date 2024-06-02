@@ -32,9 +32,10 @@ function timegraph(f)	{
 
 		});
 
-		console.log(data);
 		console.log(ref);
 		graphstat();
+
+		setvals( filters.find( d => d.name === 'graph' ) );
 
 		drawgraph(f);
 
@@ -65,6 +66,7 @@ function drawgraph(f)	{
 		
 	}
 	
+	console.log(data);
 	console.log('redraw');
 
 }
