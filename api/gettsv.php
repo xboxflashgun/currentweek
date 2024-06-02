@@ -169,7 +169,7 @@ function gettimegraph()	{
 		from hourlytab
 		$join
 		where $where $subreq
-		group by 1,2
+		group by 1,cube(2)
 		order by 1
 	";
 
@@ -219,7 +219,7 @@ function subreqtimegraph($subj, $sel)	{
 			group by 1
 			order by 2 desc
 		) as limiter
-		limit 10
+		limit 3
 	";
 
 }

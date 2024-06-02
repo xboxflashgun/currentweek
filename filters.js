@@ -26,6 +26,7 @@ var filters = [
 		tab: [],
 		idname: {},
 		drawer: horizbar,
+		stater: horstat,
 	},
 	{
 		name: "game",
@@ -35,6 +36,10 @@ var filters = [
 		drawer: gametab,
 		stater: horstat,
 	},
+	{
+		name: "graph",
+		drawer: drawgraph,
+	}
 ];
 
 var percflag;		// true if percentage scale
