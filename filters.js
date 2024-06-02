@@ -39,6 +39,7 @@ var filters = [
 	{
 		name: "graph",
 		drawer: drawgraph,
+		stater: graphstat,
 	}
 ];
 

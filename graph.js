@@ -1,6 +1,15 @@
 var data = [];		// { utime: ..., time: ..., id: ..., players: ..., val: ... }
 var ref = {};		// ref[utime] = players -- \\N for getting percentage by cube()
 
+function graphstat()	{
+
+	var [min, max] = d3.extent(data, d => d.time );
+
+	d3.select("#graph0").text(min.toLocaleString().slice(0,17));
+	d3.select("#graph1").text(max.toLocaleString().slice(0,17));
+
+}
+
 function timegraph(f)	{
 
 	console.log(f,makereqstr());
@@ -25,6 +34,7 @@ function timegraph(f)	{
 
 		console.log(data);
 		console.log(ref);
+		graphstat();
 
 		drawgraph(f);
 
