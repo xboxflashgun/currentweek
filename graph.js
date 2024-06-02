@@ -12,11 +12,11 @@ function graphstat()	{
 
 function timegraph(f)	{
 
-	console.log(f,makereqstr());
-
 	fetch("api/gettsv.php?f=gettimegraph" + makereqstr() + "&subj=" + f.name)
 	.then( res => res.text() )
 	.then( res => {
+
+		data = [];
 
 		res.split('\n').forEach( s => {
 
@@ -32,11 +32,8 @@ function timegraph(f)	{
 
 		});
 
-		console.log(ref);
 		graphstat();
-
 		setvals( filters.find( d => d.name === 'graph' ) );
-
 		drawgraph(f);
 
 	});
@@ -45,27 +42,55 @@ function timegraph(f)	{
 
 function drawgraph(f)	{
 
-	var div = d3.select("#gametab");
+	var div = d3.select("#linechart");
 	var svg = div.select("svg");
-
-	if(svg.empty())		{
 
 		const margin = { top: 10, right: 30, bottom: 30, left: 60},
 			width = div.node().clientWidth - margin.left - margin.right,
 			height = div.node().clientHeight - margin.top - margin.bottom;
 
-		svg = d3.select("#gametab").append("svg")
+	if(svg.empty())		{
+
+		svg = div.append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
 			.append("g")
 				.attr("transform", `translate(${margin.left},${margin.top})`);
 
-		var x = d3.scaleTime( d3.extent( data, d => d.time ), [ 0, width ] );
+		svg.append("g")
+			.attr("class", "xaxis")
+			.attr("transform", `translate(0, ${height})`);
 
-		console.log('init-draw');
-		
+		svg.append("g")
+			.attr("class", "yaxis");
+
 	}
 	
+	var x = d3.scaleTime( d3.extent( data, d => d.time ), [ 0, width ] );
+	var y = d3.scaleLinear( [ 0, d3.max(data, d => d.val) ], [ height, 0 ]);
+
+	var xaxis = d3.axisBottom().scale(x);
+	var yaxis = d3.axisLeft().scale(y).tickFormat(d3.format( percflag ? ".0%" : ".3~s"));
+
+	svg.selectAll(".xaxis")
+		.call( xaxis );
+
+	svg.selectAll(".yaxis")
+		.call( yaxis );
+
+	svg.selectAll(".line")
+	.data(data)
+	.join(enter => {
+		enter.append("path")
+			.attr("class", "line")
+			.attr("fill", "none")
+			.attr("stroke", "red")
+			.attr("d", p => d3.line( d => x(d.time), d => y(d.val) )());
+	}, update => {
+	}, exit => {
+		exit.remove();
+	});
+
 	console.log(data);
 	console.log('redraw');
 
