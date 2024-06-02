@@ -37,6 +37,17 @@ function timegraph(f)	{
 		});
 
 		graphstat();
+
+		// fill missed points with zeroes
+		Object.keys(data).forEach( id => {
+			for(utime = grmin.valueOf()/1000 + 3600; utime < grmax.valueOf()/1000; utime += 3600)	{
+				if( ! data[id].find( d => +d.utime === utime ))	{
+					data[id].push({ utime: utime, time: new Date(utime * 1000), players: 0 });
+				}
+			}
+			data[id].sort( (a,b) => (a.time - b.time) );
+		});
+
 		setvals( filters.find( d => d.name === 'graph' ) );
 		drawgraph(f);
 
