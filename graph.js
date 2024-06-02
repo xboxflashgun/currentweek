@@ -5,7 +5,6 @@ var grmin, grmax;
 
 function graphstat()	{
 
-	console.log(data);
 	[grmin, grmax] = d3.extent(Array.prototype.flat.call(Object.keys(data).map(d => data[d].map(e => e.time))));
 
 	d3.select("#graph0").text(grmin.toLocaleString().slice(0,17));
@@ -19,7 +18,6 @@ function timegraph(f)	{
 	.then( res => res.text() )
 	.then( res => {
 
-		
 		Object.keys(data).forEach(key => delete data[key]);
 
 		res.split('\n').forEach( s => {
@@ -41,7 +39,6 @@ function timegraph(f)	{
 		graphstat();
 		setvals( filters.find( d => d.name === 'graph' ) );
 		drawgraph(f);
-		console.log(data);
 
 	});
 
@@ -78,6 +75,7 @@ function drawgraph(f)	{
 
 	var xaxis = d3.axisBottom().scale(x);
 	var yaxis = d3.axisLeft().scale(y).tickFormat(d3.format( percflag ? ".0%" : ".3~s"));
+	var color = d3.scaleOrdinal(Object.keys(data), d3.schemeObservable10);
 
 	svg.selectAll(".xaxis")
 		.call( xaxis );
@@ -86,14 +84,17 @@ function drawgraph(f)	{
 		.call( yaxis );
 
 	svg.selectAll(".line")
-	.data(data)
+	.data(Object.keys(data))
 	.join(enter => {
 		enter.append("path")
 			.attr("class", "line")
 			.attr("fill", "none")
-			.attr("stroke", "red")
-			.attr("d", p => d3.line( d => x(d.time), d => y(d.val) )());
+			.attr("stroke", id => color(id))
+			.attr("d", id => d3.line(d => x(d.time), d => y(d.val) )(data[id]));
 	}, update => {
+		update
+			.attr("stroke", id => color(id))
+			.attr("d", id => d3.line(d => x(d.time), d => y(d.val) )(data[id]));
 	}, exit => {
 		exit.remove();
 	});

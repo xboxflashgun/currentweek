@@ -131,7 +131,7 @@ function gettimegraph()	{
 	$join = ($subj == 'genre') ? 'join gamegenres using(titleid)' : '';
 
 	static $sels = array(
-		"info" => "null::int",
+		"info" => "0",
 		"country" => "countryid",
 		"lang" => "langid",
 		"genre" => "genreid",
