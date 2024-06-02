@@ -60,7 +60,11 @@ function setvals(f)	{
 		f.tab.forEach( t => t.val = (percflag) ? 1. * t.players/f.ref : t.players );
 	
 	if(f.name === 'graph')
-		data.forEach( d => d.val = (percflag) ? 1. * d.players/ref[d.utime] : d.players );
+		Object.keys(data).forEach( id => {
+			data[id].forEach( d =>
+				d.val = (percflag) ? 1. * d.players/ref[d.utime] : d.players
+			)
+		});
 
 }
 

@@ -173,7 +173,7 @@ function gettimegraph()	{
 		order by 1
 	";
 
-#	error_log($req);
+	error_log($req);
 
 	echo implode(pg_copy_to($db, "(
 
@@ -202,7 +202,10 @@ function subreqtimegraph($subj, $sel)	{
 		$where .= " and langid is null";
 
 	if($subj == 'genre')	{
-		$where .= " and titleid is not null";
+		if(strlen($_GET['game']) > 0)
+			$where .= " and titleid=any(array[" . $_GET['game']. "])";
+		else
+			$where .= " and titleid is not null";
 		$join = "join gamegenres using(titleid)";
 	}
 

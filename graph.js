@@ -1,12 +1,15 @@
-var data = [];		// { utime: ..., time: ..., id: ..., players: ..., val: ... }
+var data = {};		// { utime: ..., time: ..., id: ..., players: ..., val: ... }
 var ref = {};		// ref[utime] = players -- \\N for getting percentage by cube()
+
+var grmin, grmax;
 
 function graphstat()	{
 
-	var [min, max] = d3.extent(data, d => d.time );
+	console.log(data);
+	[grmin, grmax] = d3.extent(Array.prototype.flat.call(Object.keys(data).map(d => data[d].map(e => e.time))));
 
-	d3.select("#graph0").text(min.toLocaleString().slice(0,17));
-	d3.select("#graph1").text(max.toLocaleString().slice(0,17));
+	d3.select("#graph0").text(grmin.toLocaleString().slice(0,17));
+	d3.select("#graph1").text(grmax.toLocaleString().slice(0,17));
 
 }
 
@@ -16,7 +19,8 @@ function timegraph(f)	{
 	.then( res => res.text() )
 	.then( res => {
 
-		data = [];
+		
+		Object.keys(data).forEach(key => delete data[key]);
 
 		res.split('\n').forEach( s => {
 
@@ -27,14 +31,17 @@ function timegraph(f)	{
 
 			if( row[1] === '\\N' )
 				ref[row[0]] = +row[2];
-			else
-				data.push( { utime: row[0], time: new Date(+row[0] * 1000), id: row[1], players: +row[2] } );
+			else	{
+				data[row[1]] ??= [];
+				data[row[1]].push({ utime: row[0], time: new Date(+row[0] * 1000), players: +row[2] });
+			}
 
 		});
 
 		graphstat();
 		setvals( filters.find( d => d.name === 'graph' ) );
 		drawgraph(f);
+		console.log(data);
 
 	});
 
@@ -66,8 +73,8 @@ function drawgraph(f)	{
 
 	}
 	
-	var x = d3.scaleTime( d3.extent( data, d => d.time ), [ 0, width ] );
-	var y = d3.scaleLinear( [ 0, d3.max(data, d => d.val) ], [ height, 0 ]);
+	var x = d3.scaleTime( [ grmin, grmax ], [ 0, width ] );
+	var y = d3.scaleLinear( [ 0, d3.max(Array.prototype.flat.call(Object.keys(data).map(d => data[d].map(e => e.val)))) ], [ height, 0 ]);
 
 	var xaxis = d3.axisBottom().scale(x);
 	var yaxis = d3.axisLeft().scale(y).tickFormat(d3.format( percflag ? ".0%" : ".3~s"));
