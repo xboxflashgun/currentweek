@@ -378,7 +378,7 @@ function readalldata()	{
 
 		listfilters();
 
-		timegraph(filters[0]);
+		timegraph(filters[1]);
 
 	});
 

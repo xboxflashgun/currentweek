@@ -42,7 +42,9 @@ function timegraph(f)	{
 		Object.keys(data).forEach( id => {
 			for(utime = grmin.valueOf()/1000 + 3600; utime < grmax.valueOf()/1000; utime += 3600)	{
 				if( ! data[id].find( d => +d.utime === utime ))	{
-					data[id].push({ utime: utime, time: new Date(utime * 1000), players: 0 });
+					data[id].push({ utime: utime.toString(), time: new Date(utime * 1000), players: 0 });
+					if( ! ref[utime.toString()] )
+						ref[utime.toString()] = 1;
 				}
 			}
 			data[id].sort( (a,b) => (a.time - b.time) );
@@ -55,28 +57,29 @@ function timegraph(f)	{
 
 }
 
+var grsvg;
+
 function drawgraph(f)	{
 
 	var div = d3.select("#linechart");
-	var svg = div.select("svg");
 
-		const margin = { top: 10, right: 30, bottom: 30, left: 60},
-			width = div.node().clientWidth - margin.left - margin.right,
-			height = div.node().clientHeight - margin.top - margin.bottom;
+	const margin = { top: 10, right: 30, bottom: 30, left: 60},
+		width = div.node().clientWidth - margin.left - margin.right,
+		height = div.node().clientHeight - margin.top - margin.bottom;
 
-	if(svg.empty())		{
+	if(! grsvg)	{
 
-		svg = div.append("svg")
+		grsvg = div.append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
 			.append("g")
 				.attr("transform", `translate(${margin.left},${margin.top})`);
 
-		svg.append("g")
+		grsvg.append("g")
 			.attr("class", "xaxis")
 			.attr("transform", `translate(0, ${height})`);
 
-		svg.append("g")
+		grsvg.append("g")
 			.attr("class", "yaxis");
 
 	}
@@ -88,13 +91,13 @@ function drawgraph(f)	{
 	var yaxis = d3.axisLeft().scale(y).tickFormat(d3.format( percflag ? ".0%" : ".3~s"));
 	var color = d3.scaleOrdinal(Object.keys(data), d3.schemeObservable10);
 
-	svg.selectAll(".xaxis")
+	grsvg.selectAll(".xaxis")
 		.call( xaxis );
 
-	svg.selectAll(".yaxis")
+	grsvg.selectAll(".yaxis")
 		.call( yaxis );
 
-	svg.selectAll(".line")
+	grsvg.selectAll(".line")
 	.data(Object.keys(data))
 	.join(enter => {
 		enter.append("path")

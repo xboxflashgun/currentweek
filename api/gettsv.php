@@ -192,12 +192,18 @@ function subreqtimegraph($subj, $sel)	{
 	$join = "";
 
 	if($subj == 'country')
-		$where .= "countryid is not null";
+		if(strlen($_GET['country']) > 0)
+			$where .= "countryid=any(array[" . $_GET['country'] . "])";
+		else
+			$where .= "countryid is not null";
 	else
 		$where .= "countryid is null";
 
 	if($subj == 'lang')
-		$where .= " and langid is not null";
+		if(strlen($_GET['lang']) > 0)
+			$where .= " and langid=any(array[" . $_GET['lang'] . "])";
+		else
+			$where .= " and langid is not null";
 	else
 		$where .= " and langid is null";
 
@@ -210,6 +216,11 @@ function subreqtimegraph($subj, $sel)	{
 	}
 
 	if($subj == 'game')
+		if(strlen($_GET['game']) > 0)
+			$where .= " and titleid=any(array[" . $_GET['game']. "])";
+		else
+			$where .= " and titleid is not null";
+	else
 		$where .= " and titleid is not null";
 
 	return "
