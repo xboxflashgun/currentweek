@@ -173,15 +173,13 @@ function gettimegraph()	{
 		order by 1
 	";
 
-	error_log($req);
+#	error_log($req);
 
 	echo implode(pg_copy_to($db, "(
 
 		$req
 
 	)", chr(9)));
-	
-#	echo $req;
 
 }
 
@@ -233,7 +231,7 @@ function subreqtimegraph($subj, $sel)	{
 			group by 1
 			order by 2 desc
 		) as limiter
-		limit 3
+		limit 10
 	";
 
 }

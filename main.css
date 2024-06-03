@@ -17,7 +17,7 @@ body {
 	width: 288px;
 	height: 900px; 
 	float: left;
-	overflow-y: scroll;
+	overflow-y: hidden;
 }
 
 #infodiv,#countrydiv,#langdiv,#genrediv	{
@@ -30,6 +30,7 @@ body {
 	padding: 2px 20px;
 	background-color: #424;
 	color: #eee;
+	font-size: 16px;
 }
 
 #filterdiv	{
@@ -77,6 +78,8 @@ body {
 
 #gametab {
 	font-size: 10px;
+	height: 900px;
+	overflow-y: scroll;
 }
 
 #gametab table {
@@ -86,6 +89,11 @@ body {
 
 #gametab tr {
 	cursor: pointer;
+}
+
+#searchfilt {
+	padding-left: 10px;
+	font-size: 13px;
 }
 
 #gametab td:nth-child(2)	{

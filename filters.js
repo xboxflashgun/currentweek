@@ -76,7 +76,7 @@ function gametab(f)	{
 	}
 
 	var tab = f.div.select("table");
-	var str = d3.select(`#${f.name}div input`).property("value").toLowerCase();
+	var str = d3.select(`#namefilter`).property("value").toLowerCase();
 	var fff;	// filter function
 
 	if(str.length > 0)
@@ -112,7 +112,7 @@ function gametab(f)	{
 		d3.select(e.target.parentNode).style('color', f.sels.has(e.target.parentNode.dataset.id) ? '#fff' : null);
 	});
 
-	d3.select(`#${f.name}div input`).on( 'input', () => gametab(f) );
+	d3.select("#namefilter").on( 'input', () => gametab(f) );
 
 }
 
@@ -378,7 +378,18 @@ function readalldata()	{
 
 		listfilters();
 
-		timegraph(filters[1]);
+		var filt = d3.select('input[name="filter"]:checked').property("value");
+
+		timegraph(filters.find( d => d.name === filt ));
+
+		d3.selectAll('input[name="filter"]').on('change', (e) => {
+
+			var filt = d3.select('input[name="filter"]:checked').property("value");
+			timegraph(filters.find( d => d.name === filt ));
+
+			console.log(filt);
+
+		});
 
 	});
 
