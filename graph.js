@@ -63,7 +63,7 @@ function drawgraph(f)	{
 
 	var div = d3.select("#linechart");
 
-	const margin = { top: 10, right: 30, bottom: 30, left: 60},
+	const margin = { top: 10, right: 10, bottom: 30, left: 40},
 		width = div.node().clientWidth - margin.left - margin.right,
 		height = div.node().clientHeight - margin.top - margin.bottom;
 
@@ -116,15 +116,41 @@ function drawgraph(f)	{
 	// Legend
 	var legend = d3.select("#legend")
 	.style("top", "230px")
-	.style("left", "280px")
+	.style("left", "330px")
 	.style("display", null)
 	.call(d3.drag()
-		.on("start", (e) => legend.style("color", "red"))
+		.on("start", (e) => legend.style("color", "#777"))
 		.on("drag", (e) => {
 			legend.style("top", legend.node().offsetTop + e.dy + "px");
 			legend.style("left", legend.node().offsetLeft + e.dx + "px");
 		})
-		.on("end", (e) => legend.style("color", "white"))
+		.on("end", (e) => legend.style("color", "#999"))
 	);
+
+	var myf = filters.find( d => d.name === d3.select('input[name="filter"]:checked').property("value"));
+
+	function legendname(d)	{
+
+		console.log(myf);
+		if(! myf.idname)
+			return "all gamers";
+		if(myf.name === 'game')
+			return myf.idname[d][0];
+
+		return myf.idname[d][1];
+
+	}
+
+	legend.select("#legend table").selectAll("tr")
+	.data(Object.keys(data))
+	.join( enter => {
+		var row = enter.append("tr");
+		row.append("td").html("&#x25a0;").style("color", id => color(id));
+		row.append("td").text(d => legendname(d));
+	}, update => {
+		update.select("td:nth-child(2)").text(d => legendname(d) );
+	}, exit => {
+		exit.remove();
+	});
 
 }
