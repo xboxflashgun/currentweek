@@ -61,6 +61,7 @@ function setvals(f)	{
 	
 	if(f.name === 'graph')
 		Object.keys(data).forEach( id => {
+			console.log(id, ref);
 			data[id].forEach( d =>
 				d.val = (percflag) ? 1. * d.players/ref[d.utime] : d.players
 			)
@@ -388,8 +389,6 @@ function readalldata()	{
 
 			var filt = d3.select('input[name="filter"]:checked').property("value");
 			timegraph(filters.find( d => d.name === filt ));
-
-			console.log(filt);
 
 		});
 
