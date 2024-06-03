@@ -113,7 +113,18 @@ function drawgraph(f)	{
 		exit.remove();
 	});
 
-	console.log(data);
-	console.log('redraw');
+	// Legend
+	var legend = d3.select("#legend")
+	.style("top", "230px")
+	.style("left", "280px")
+	.style("display", null)
+	.call(d3.drag()
+		.on("start", (e) => legend.style("color", "red"))
+		.on("drag", (e) => {
+			legend.style("top", legend.node().offsetTop + e.dy + "px");
+			legend.style("left", legend.node().offsetLeft + e.dx + "px");
+		})
+		.on("end", (e) => legend.style("color", "white"))
+	);
 
 }
