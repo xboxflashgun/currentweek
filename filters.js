@@ -226,9 +226,9 @@ function barchart(f)	{
 
 	var div = d3.select(`#${f.name}div .svg`).classed("horscroll", true);
 
-	var margin = { top: 10, right: 30, bottom: 40, left: 60 },
-		width = f.tab.length * 20 + 90 - margin.left - margin.right,
-		height = div.node().clientHeight - margin.top - margin.bottom;
+	var margin = { top: 7, right: 10, bottom: 24, left: 35 },
+		width = f.tab.length * 19 + 90 - margin.left - margin.right,
+		height = div.node().clientHeight - margin.top - margin.bottom - 23;
 
 	if( ! f.svg )	{
 
@@ -328,6 +328,8 @@ function barchart(f)	{
 function readalldata()	{
 
 	var pr = [];
+
+	percflag = d3.select('#infodiv input[value="perc"]').property("checked");
 
 	filters.forEach( f => {
 		
