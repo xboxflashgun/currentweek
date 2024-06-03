@@ -105,11 +105,12 @@ function drawgraph(f)	{
 			.attr("fill", "none")
 			.attr("data-id", id => id)
 			.attr("stroke", id => color(id))
-			.attr("stroke-width", 1)
+			.attr("stroke-width", 1.5)
 			.attr("d", id => d3.line(d => x(d.time), d => y(d.val) )(data[id]));
 	}, update => {
 		update
 			.attr("stroke", id => color(id))
+			.attr("data-id", id => id)
 			.attr("d", id => d3.line(d => x(d.time), d => y(d.val) )(data[id]));
 	}, exit => {
 		exit.remove();
@@ -128,6 +129,18 @@ function drawgraph(f)	{
 		})
 		.on("end", (e) => legend.style("cursor", "default"))
 	);
+
+	grsvg.selectAll(".line")
+	.on("mouseover", e => {
+		var id = e.target.dataset.id;
+		d3.select(e.target).attr("stroke-width", 3);
+		legend.select(`tr[data-id="${id}"]`).style("color", "#fff");
+	})
+	.on("mouseout", e => {
+		var id = e.target.dataset.id;
+		d3.select(e.target).attr("stroke-width", 1.5);
+		legend.select(`tr[data-id="${id}"]`).style("color", "#999");
+	});
 
 	var myf = filters.find( d => d.name === d3.select('input[name="filter"]:checked').property("value"));
 
@@ -171,7 +184,7 @@ function drawgraph(f)	{
 		var id = e.target.parentNode.dataset.id;
 		grsvg.selectAll(`path[data-id="${id}"]`)
 			.attr("stroke", color(id))
-			.attr("stroke-width", 1);
+			.attr("stroke-width", 1.5);
 		d3.select(e.target.parentNode).style("color", "#999");
 
 	});
