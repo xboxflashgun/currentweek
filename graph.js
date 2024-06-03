@@ -103,7 +103,9 @@ function drawgraph(f)	{
 		enter.append("path")
 			.attr("class", "line")
 			.attr("fill", "none")
+			.attr("data-id", id => id)
 			.attr("stroke", id => color(id))
+			.attr("stroke-width", 1)
 			.attr("d", id => d3.line(d => x(d.time), d => y(d.val) )(data[id]));
 	}, update => {
 		update
@@ -119,19 +121,18 @@ function drawgraph(f)	{
 	.style("left", "330px")
 	.style("display", null)
 	.call(d3.drag()
-		.on("start", (e) => legend.style("color", "#777"))
+		.on("start", (e) => legend.style("cursor", "drag"))
 		.on("drag", (e) => {
 			legend.style("top", legend.node().offsetTop + e.dy + "px");
 			legend.style("left", legend.node().offsetLeft + e.dx + "px");
 		})
-		.on("end", (e) => legend.style("color", "#999"))
+		.on("end", (e) => legend.style("cursor", "default"))
 	);
 
 	var myf = filters.find( d => d.name === d3.select('input[name="filter"]:checked').property("value"));
 
 	function legendname(d)	{
 
-		console.log(myf);
 		if(! myf.idname)
 			return "all gamers";
 		if(myf.name === 'game')
@@ -145,12 +146,34 @@ function drawgraph(f)	{
 	.data(Object.keys(data))
 	.join( enter => {
 		var row = enter.append("tr");
+		row.attr("data-id", d => d);
 		row.append("td").html("&#x25a0;").style("color", id => color(id));
 		row.append("td").text(d => legendname(d));
 	}, update => {
 		update.select("td:nth-child(2)").text(d => legendname(d) );
+		update.attr("data-id", d => d);
 	}, exit => {
 		exit.remove();
+	});
+
+	legend.select("#legend table").selectAll("tr")
+	.on("mouseover", e => {
+
+		var id = e.target.parentNode.dataset.id;
+		grsvg.selectAll(`path[data-id="${id}"]`)
+			.attr("stroke", color(id))
+			.attr("stroke-width", 3);
+		d3.select(e.target.parentNode).style("color", "#fff");
+
+	})
+	.on("mouseout", e => {
+
+		var id = e.target.parentNode.dataset.id;
+		grsvg.selectAll(`path[data-id="${id}"]`)
+			.attr("stroke", color(id))
+			.attr("stroke-width", 1);
+		d3.select(e.target.parentNode).style("color", "#999");
+
 	});
 
 }
