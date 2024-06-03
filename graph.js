@@ -130,16 +130,32 @@ function drawgraph(f)	{
 		.on("end", (e) => legend.style("cursor", "default"))
 	);
 
+	var tip = d3.select("#graphtip");
+	var to;
+
 	grsvg.selectAll(".line")
 	.on("mouseover", e => {
+
 		var id = e.target.dataset.id;
 		d3.select(e.target).attr("stroke-width", 3);
 		legend.select(`tr[data-id="${id}"]`).style("color", "#fff");
+
+		var date = x.invert(d3.pointer(e)[0]);
+		var d = data[id].find( d => d.time > date);
+		tip.style("top", e.clientY - 42 + "px")
+			.style("left", e.clientX + "px")
+			.style("display", null)
+		tip.html(`Date: ${d.time.toLocaleString().slice(0,17)}<br />Players: ${d.players}`);
+		clearTimeout(to);
+
 	})
 	.on("mouseout", e => {
+
 		var id = e.target.dataset.id;
 		d3.select(e.target).attr("stroke-width", 1.5);
 		legend.select(`tr[data-id="${id}"]`).style("color", "#999");
+		to = setTimeout( () => tip.style("display", "none"), 2000)
+
 	});
 
 	var myf = filters.find( d => d.name === d3.select('input[name="filter"]:checked').property("value"));

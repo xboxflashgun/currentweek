@@ -136,6 +136,16 @@ body {
 	font-size: 12px;
 }
 
+#graphtip	{
+	position: absolute;
+	color: #ccc;
+	background-color: #33c;
+	padding: 5px;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	font-size: 12px;
+}
+
 a {
 	color: #99c8ff;
 }
