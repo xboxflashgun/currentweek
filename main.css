@@ -88,7 +88,7 @@ body {
 
 #gametab {
 	font-size: 10px;
-	height: 900px;
+	height: 752px;
 	overflow-y: scroll;
 }
 
@@ -134,4 +134,15 @@ body {
 	border: 1px solid #999;
 	border-radius: 5px;
 	font-size: 12px;
+}
+
+a {
+	color: #99c8ff;
+}
+
+#footer	{
+	float: left;
+	font-size: 12px;
+	text-align: right;
+	width: 100%;
 }
