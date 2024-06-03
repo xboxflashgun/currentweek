@@ -205,21 +205,18 @@ function subreqtimegraph($subj, $sel)	{
 	else
 		$where .= " and langid is null";
 
-	if($subj == 'genre')	{
+	if($subj == 'genre' || $subj == 'game')	{
+	
 		if(strlen($_GET['genre']) > 0)
 			$where .= " and titleid=any(select titleid from gamegenres where genreid=any(array[" . $_GET['genre'] . "]))";
-		else
-			$where .= " and titleid is not null";
-		$join = "join gamegenres using(titleid)";
-	}
 
-	if($subj == 'game')
 		if(strlen($_GET['game']) > 0)
 			$where .= " and titleid=any(array[" . $_GET['game']. "])";
-		else
-			$where .= " and titleid is not null";
-	else
+
 		$where .= " and titleid is not null";
+
+	} else
+		$where .= " and titleid is null";
 
 	return "
 		select $sel from (

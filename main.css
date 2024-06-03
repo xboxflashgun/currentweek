@@ -47,8 +47,9 @@ body {
 	width: 1148px;
 	float: left;
 	background-color: #525;
-	height: 20px;
+	height: 15px;
 	font-size: 12px;
+	padding-left: 4px;
 }
 
 #linechart	{
