@@ -36,6 +36,7 @@ function timegraph(f)	{
 		.then( res => res.text() )
 		.then( res => {
 
+			console.log(res);
 			res.split('\n').forEach( s => {
 
 				if(s.length === 0)
@@ -43,8 +44,11 @@ function timegraph(f)	{
 
 				var row = s.split('\t');
 				// utime, subj, ref
-				data[row[1]] ??= [];
-				data[row[1]].find( d => d.utime === row[0]).ref = +row[2];
+				var d;
+				if(data[row[1]])
+					d = data[row[1]].find( d => d.utime === row[0]);
+				if(d)	
+					d.ref = +row[2];
 
 			});
 		
