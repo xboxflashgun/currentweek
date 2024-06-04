@@ -1,5 +1,3 @@
-// 
-
 var filters = [
 	{
 		name: "info",
@@ -61,9 +59,8 @@ function setvals(f)	{
 	
 	if(f.name === 'graph')
 		Object.keys(data).forEach( id => {
-			console.log(id, ref);
 			data[id].forEach( d =>
-				d.val = (percflag) ? 1. * d.players/ref[d.utime] : d.players
+				d.val = (percflag) ? 1. * d.players/d.ref : d.players
 			)
 		});
 

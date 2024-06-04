@@ -1,5 +1,4 @@
-var data = {};		// { utime: ..., time: ..., id: ..., players: ..., val: ... }
-var ref = {};		// ref[utime] = players -- \\N for getting percentage by cube()
+var data = {};		// { utime: ..., time: ..., id: ..., players: ..., val: ... ref: ... }
 
 var grmin, grmax;
 
@@ -26,29 +25,27 @@ function timegraph(f)	{
 				return;
 
 			var row = s.split('\t');
+			// utime, subj, ref, players
 
-			if( row[1] === '\\N' )
-				ref[row[0]] = +row[2];
-			else	{
-				data[row[1]] ??= [];
-				data[row[1]].push({ utime: row[0], time: new Date(+row[0] * 1000), players: +row[2] });
-			}
+			data[row[1]] ??= [];
+			data[row[1]].push({ utime: row[0], time: new Date(+row[0] * 1000), ref: +row[2], players: (row[3] === '\\N') ? 0 : +row[3] });
 
 		});
 
+		console.log(data);
 		graphstat();
 
 		// fill missed points with zeroes
-		Object.keys(data).forEach( id => {
-			for(utime = grmin.valueOf()/1000 + 3600; utime < grmax.valueOf()/1000; utime += 3600)	{
-				if( ! data[id].find( d => +d.utime === utime ))	{
-					data[id].push({ utime: utime.toString(), time: new Date(utime * 1000), players: 0 });
-					if( ! ref[utime.toString()] )
-						ref[utime.toString()] = 1;
-				}
-			}
-			data[id].sort( (a,b) => (a.time - b.time) );
-		});
+//		Object.keys(data).forEach( id => {
+//			for(utime = grmin.valueOf()/1000 + 3600; utime < grmax.valueOf()/1000; utime += 3600)	{
+//				if( ! data[id].find( d => +d.utime === utime ))	{
+//					data[id].push({ utime: utime.toString(), time: new Date(utime * 1000), players: 0 });
+//					if( ! ref[utime.toString()] )
+//						ref[utime.toString()] = 1;
+//				}
+//			}
+//			data[id].sort( (a,b) => (a.time - b.time) );
+//		});
 
 		setvals( filters.find( d => d.name === 'graph' ) );
 		drawgraph(f);
