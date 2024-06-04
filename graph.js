@@ -13,11 +13,11 @@ function graphstat()	{
 
 function timegraph(f)	{
 
+	Object.keys(data).forEach(key => delete data[key]);
+
 	fetch("api/gettsv.php?f=gettimegraph" + makereqstr() + "&subj=" + f.name)
 	.then( res => res.text() )
 	.then( res => {
-
-		Object.keys(data).forEach(key => delete data[key]);
 
 		res.split('\n').forEach( s => {
 
@@ -25,15 +25,37 @@ function timegraph(f)	{
 				return;
 
 			var row = s.split('\t');
-			// utime, subj, ref, players
+			// utime, subj, players
 
 			data[row[1]] ??= [];
-			data[row[1]].push({ utime: row[0], time: new Date(+row[0] * 1000), ref: +row[2], players: (row[3] === '\\N') ? 0 : +row[3] });
+			data[row[1]].push({ utime: row[0], time: new Date(+row[0] * 1000), players: (row[2] === '\\N') ? 0 : +row[2] });
+
+		});
+	
+		fetch("api/gettsv.php?f=gettimeref" + makereqstr() + "&subj=" + f.name)
+		.then( res => res.text() )
+		.then( res => {
+
+			res.split('\n').forEach( s => {
+
+				if(s.length === 0)
+					return;
+
+				var row = s.split('\t');
+				// utime, subj, ref
+				data[row[1]] ??= [];
+				data[row[1]].find( d => d.utime === row[0]).ref = +row[2];
+
+			});
+		
+			console.log(data);
+			graphstat();
+
+			setvals( filters.find( d => d.name === 'graph' ) );
+			drawgraph(f);
 
 		});
 
-		console.log(data);
-		graphstat();
 
 		// fill missed points with zeroes
 //		Object.keys(data).forEach( id => {
@@ -46,9 +68,6 @@ function timegraph(f)	{
 //			}
 //			data[id].sort( (a,b) => (a.time - b.time) );
 //		});
-
-		setvals( filters.find( d => d.name === 'graph' ) );
-		drawgraph(f);
 
 	});
 
