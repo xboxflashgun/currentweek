@@ -181,7 +181,7 @@ function gettimegraph()	{
 				from res
 				group by 1
 				order by 2 desc
-				limit 3
+				limit 10
 			) as limiter
 		)
 		order by utime
@@ -191,93 +191,6 @@ function gettimegraph()	{
 	pg_query($db, "rollback");
 
 	pg_close($db);
-
-}
-
-
-function gettimeref()	{
-
-	global $db;
-
-	$where = "";		# filter condition
-
-	static $sels = array(
-		"info" => "0",
-		"country" => "countryid",
-		"lang" => "langid",
-		"genre" => "genreid",
-		"game" => "titleid",
-	);
-
-	$subj = $sels[$_GET['subj']];
-	$join = ($subj == 'genreid') ? 'join gamegenres using(titleid)' : '';
-
-	if($subj == 'countryid')
-		if(strlen($_GET['country']) > 0)
-			$where .= "countryid=any(array[" . $_GET['country'] . "])";
-		else
-			$where .= "countryid is not null";
-	else
-		$where .= "countryid is null";
-
-	if($subj == 'langid')
-		if(strlen($_GET['lang']) > 0)
-			$where .= " and langid=any(array[" . $_GET['lang'] . "])";
-		else
-			$where .= " and langid is not null";
-	else
-		$where .= " and langid is null";
-
-	if($subj == 'genreid' || $subj == 'titleid') {
-		if(strlen($_GET['game']) > 0)
-			$where .= " and titleid=any(array[" . $_GET['game']. "])";
-
-		if(strlen($_GET['genre']) > 0)
-			$where .= " and titleid=any(select titleid from gamegenres where genreid=any(array[" . $_GET['genre'] . "]))";
-
-		$where .= " and titleid is not null";
-
-	} else
-		$where .= " and titleid is null";
-
-	# condition is ready
-	# now limiter
-	$limiter = "
-		select $subj from (
-			select $subj,sum(players)
-			from stattotals0
-			$join
-			where $where
-			group by 1
-			order by 2 desc
-			limit 3
-		) as limiter
-	";
-
-	$req = "
-		select 
-			utime,
-			$subj,
-			sum(players)
-		from stattab
-		$join
-		where 
-			titleid is not null
-			and countryid is not null
-			and langid is not null
-			and $subj=any($limiter)
-			and type=0
-		group by 1,2
-		order by 1
-	";
-
-	error_log($req);
-
-	echo implode(pg_copy_to($db, "(
-
-		$req
-
-	)", chr(9)));
 
 }
 

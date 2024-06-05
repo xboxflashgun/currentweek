@@ -32,46 +32,32 @@ function timegraph(f)	{
 
 		});
 	
-		fetch("api/gettsv.php?f=gettimeref" + makereqstr() + "&subj=" + f.name)
-		.then( res => res.text() )
-		.then( res => {
+		// f.ref is here
+		
+		var ref = {};
+		Object.keys(data).forEach( id => {
+			data[id].forEach( p => {
 
-			console.log(res);
-			res.split('\n').forEach( s => {
-
-				if(s.length === 0)
-					return;
-
-				var row = s.split('\t');
-				// utime, subj, ref
-				var d;
-				if(data[row[1]])
-					d = data[row[1]].find( d => d.utime === row[0]);
-				if(d)	
-					d.ref = +row[2];
+				ref[p.utime] ??= 0;
+				ref[p.utime] += p.players;
 
 			});
-		
-			console.log(data);
-			graphstat();
-
-			setvals( filters.find( d => d.name === 'graph' ) );
-			drawgraph(f);
-
 		});
 
+		Object.keys(data).forEach( id => {
+			data[id].forEach( p => {
 
-		// fill missed points with zeroes
-//		Object.keys(data).forEach( id => {
-//			for(utime = grmin.valueOf()/1000 + 3600; utime < grmax.valueOf()/1000; utime += 3600)	{
-//				if( ! data[id].find( d => +d.utime === utime ))	{
-//					data[id].push({ utime: utime.toString(), time: new Date(utime * 1000), players: 0 });
-//					if( ! ref[utime.toString()] )
-//						ref[utime.toString()] = 1;
-//				}
-//			}
-//			data[id].sort( (a,b) => (a.time - b.time) );
-//		});
+				p.ref = ref[p.utime];
+
+			});
+		});
+
+		console.log(ref);
+		console.log(data);
+		graphstat();
+
+		setvals( filters.find( d => d.name === 'graph' ) );
+		drawgraph(f);
 
 	});
 
