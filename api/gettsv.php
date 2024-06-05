@@ -27,8 +27,8 @@ function getcatalog()	{
 	global $db;
 
 	static $select = array(
-		"country" => "countryid,country,name from weeklytotals join countries using(countryid)",
-		"lang" => "langid,lang,name from weeklytotals join languages using(langid)",
+		"country" => "countryid,country,name from stattotals0 join countries using(countryid)",
+		"lang" => "langid,lang,name from stattotals0 join languages using(langid)",
 		"genre" => "genreid,genre,genre from genres join gamegenres using(genreid) join stattotals0 using(titleid)",
 		"game" => "titleid,name,'' from games join stattotals0 using(titleid)"
 	);
