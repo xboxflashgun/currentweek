@@ -167,6 +167,7 @@ function gettimegraph()	{
 		from stattab
 		$join
 		where $where
+		and type=0
 		group by 1,2
 	");
 
@@ -265,6 +266,7 @@ function gettimeref()	{
 			and countryid is not null
 			and langid is not null
 			and $subj=any($limiter)
+			and type=0
 		group by 1,2
 		order by 1
 	";
