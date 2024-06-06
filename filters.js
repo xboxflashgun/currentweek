@@ -93,12 +93,12 @@ function gametab(f)	{
 		row.attr("data-id", d => d.id);
 		row.append("td").text( d => d.name);
 		row.append("td").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
-		row.style("background", d => `linear-gradient(to right, #252 ${100.*d.players/playmax}%, rgba(0,0,0,0) ${100.*d.players/playmax}% )`);
+		row.style("background", d => `linear-gradient(to right, #050 ${100.*d.players/playmax}%, rgba(0,0,0,0) ${100.*d.players/playmax}% )`);
 	}, update => {
 		update.attr("data-id", d => d.id);
 		update.select("td:nth-child(1)").text(d => d.name);
 		update.select("td:nth-child(2)").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
-		update.style("background", d => `linear-gradient(to right, green ${100.*d.players/playmax}%, rgba(0,0,0,0) ${100.*d.players/playmax}% )`);
+		update.style("background", d => `linear-gradient(to right, #050 ${100.*d.players/playmax}%, rgba(0,0,0,0) ${100.*d.players/playmax}% )`);
 	}, exit => {
 		exit.remove();
 	});
