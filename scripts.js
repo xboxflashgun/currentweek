@@ -5,5 +5,6 @@ function main()	{
 	var filt = d3.select('input[name="filter"]:checked').property("value");
 	d3.select("#" + filt + "div").classed("tabsel", true);
 	readalldata();
+	d3.select("#" + d3.select('input[name="filter"]:checked').property("value") + "div").classed("filtselected", true);
 
 }

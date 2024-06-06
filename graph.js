@@ -208,15 +208,22 @@ function drawgraph(f)	{
 	.on("mouseover", e => {
 
 		var id = e.target.dataset.id;
+		var date = x.invert(d3.pointer(e)[0]);
+		var ind = data[id].findIndex( d => d.time > date );
+		var d = data[id][ind];
+
+		legend.select(".legendhead").text(d.time.toLocaleString().slice(0,17));
+		Object.keys(data).forEach( id => {
+			legend.select(`tr[data-id="${id}"] td:nth-child(3)`).text(data[id][ind].players);
+		});
+
 		d3.select(e.target).attr("stroke-width", 3);
 		legend.select(`tr[data-id="${id}"]`).style("color", "#fff");
 
-		var date = x.invert(d3.pointer(e)[0]);
-		var d = data[id].find( d => d.time > date);
-		tip.style("top", e.clientY - 42 + "px")
+		tip.style("top", e.clientY - 61 + "px")
 			.style("left", e.clientX + "px")
 			.style("display", null)
-		tip.html(`Date: ${d.time.toLocaleString().slice(0,17)}<br />Players: ${d.players}`);
+		tip.html(`Date: ${d.time.toLocaleString().slice(0,17)}<br />Players: ${d.players}<br />${f.idname[id][0]}`);
 		clearTimeout(to);
 
 	})
@@ -226,10 +233,16 @@ function drawgraph(f)	{
 		d3.select(e.target).attr("stroke-width", 1.5);
 		legend.select(`tr[data-id="${id}"]`).style("color", "#999");
 		to = setTimeout( () => tip.style("display", "none"), 2000)
+		Object.keys(data).forEach( id => {
+			legend.select(`tr[data-id="${id}"] td:nth-child(3)`).text("");
+		});
+		legend.select(".legendhead").text("Legend");
 
 	});
 
 	var myf = filters.find( d => d.name === d3.select('input[name="filter"]:checked').property("value"));
+	d3.selectAll(".filtselected").classed("filtselected", false);
+	d3.select("#" + myf.name + "div").classed("filtselected", true);
 
 	function legendname(d)	{
 

@@ -294,7 +294,9 @@ function barchart(f)	{
 			.remove();
 	});
 
-	f.svg.selectAll("text").on("click", (e) => {
+	f.xaxis.selectAll("text")
+	.classed("pointer", true)
+	.on("click", (e) => {
 		var name = d3.select(e.target).text();
 		var id = Object.keys(f.idname).filter( d => f.idname[d][0] === name )[0];
 		select(f, id);
@@ -422,6 +424,21 @@ function listfilters()	{
 			readalldata();
 
 		});
+
+	});
+
+	d3.select("#filtclear").on('click', () => {
+
+		filters.forEach( f => {
+
+			if( ! f.tab )
+				return;
+
+			f.sels.clear();
+
+		});
+
+		listfilters();
 
 	});
 
