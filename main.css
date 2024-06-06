@@ -64,7 +64,11 @@ body {
 	height: 100%;
 }
 
-.svg rect,text	{
+.svg rect	{
+	cursor: pointer;
+}
+
+.pointer	{
 	cursor: pointer;
 }
 
