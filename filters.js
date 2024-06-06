@@ -386,6 +386,8 @@ function readalldata()	{
 
 			var filt = d3.select('input[name="filter"]:checked').property("value");
 			timegraph(filters.find( d => d.name === filt ));
+			d3.select(".tabsel").classed("tabsel", false);
+			d3.select("#" + filt + "div").classed("tabsel", true);
 
 		});
 

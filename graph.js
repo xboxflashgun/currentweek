@@ -114,7 +114,7 @@ function drawgraph(f)	{
 
 	var div = d3.select("#linechart");
 
-	const margin = { top: 10, right: 10, bottom: 30, left: 40},
+	const margin = { top: 10, right: 10, bottom: 20, left: 40},
 		width = div.node().clientWidth - margin.left - margin.right,
 		height = div.node().clientHeight - margin.top - margin.bottom;
 
@@ -128,17 +128,24 @@ function drawgraph(f)	{
 
 		grsvg.append("g")
 			.attr("class", "xaxis")
+			.attr("pointer-events", "bounding-box")
 			.attr("transform", `translate(0, ${height})`);
+		grsvg.select(".xaxis").append("rect")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", "100%")
+			.attr("height", "100%")
+			.attr("fill", "none");
 
 		grsvg.append("g")
 			.attr("class", "yaxis");
 
 	}
 	
-	var x = d3.scaleTime( [ grmin, grmax ], [ 0, width ] );
+	var x = d3.scaleTime( [ grmin, grmax ], [ 0, width ] );	// .nice();
 	var y = d3.scaleLinear( [ 0, d3.max(Array.prototype.flat.call(Object.keys(data).map(d => data[d].map(e => e.val)))) ], [ height, 0 ]);
 
-	var xaxis = d3.axisBottom().scale(x);
+	var xaxis = d3.axisBottom().scale(x);	// .ticks(28).tickFormat(d3.timeFormat("%H"));
 	var yaxis = d3.axisLeft().scale(y).tickFormat(d3.format( percflag ? ".0%" : ".3~s"));
 	var color = d3.scaleOrdinal(Object.keys(data), d3.schemeObservable10);
 
@@ -147,7 +154,7 @@ function drawgraph(f)	{
 
 	grsvg.selectAll(".yaxis")
 		.call( yaxis );
-
+	
 	grsvg.selectAll(".line")
 	.data(Object.keys(data))
 	.join(enter => {
@@ -167,8 +174,21 @@ function drawgraph(f)	{
 		exit.remove();
 	});
 
-	// Legend
 	var legend = d3.select("#legend")
+
+	grsvg.select("rect").on("mouseout", e => {
+		Object.keys(data).forEach( id => {
+			legend.select(`tr[data-id="${id}"] td:nth-child(3)`).text("");
+		});
+		console.log(e);
+	});
+	
+	grsvg.select("rect").on("mousemove", e => {
+		console.log(e);
+	});
+
+	// Legend
+	legend
 	.style("top", "230px")
 	.style("left", "330px")
 	.style("display", null)
@@ -229,6 +249,7 @@ function drawgraph(f)	{
 		row.attr("data-id", d => d);
 		row.append("td").html("&#x25a0;").style("color", id => color(id));
 		row.append("td").text(d => legendname(d));
+		row.append("td").text("");
 	}, update => {
 		update.select("td:nth-child(2)").text(d => legendname(d) );
 		update.attr("data-id", d => d);

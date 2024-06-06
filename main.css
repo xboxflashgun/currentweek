@@ -15,7 +15,7 @@ body {
 
 #gamediv	{
 	width: 288px;
-	height: 900px; 
+	height: 796px; 
 	float: left;
 	overflow-y: hidden;
 }
@@ -138,6 +138,12 @@ body {
 	font-size: 12px;
 }
 
+.legendhead	{
+
+	border-bottom: 1px solid #bbb;
+	font-size: 13px;
+}
+
 #graphtip	{
 	position: absolute;
 	color: #ccc;
@@ -157,4 +163,9 @@ a {
 	font-size: 12px;
 	text-align: right;
 	width: 100%;
+	padding-top: 50px;
+}
+
+.tabsel	{
+	background-color: #525;
 }
