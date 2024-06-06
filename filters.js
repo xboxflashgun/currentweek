@@ -329,6 +329,7 @@ function readalldata()	{
 
 	var pr = [];
 
+	d3.select("#waiting").style("display", null);
 	percflag = d3.select('#infodiv input[value="perc"]').property("checked");
 
 	filters.forEach( f => {
@@ -439,6 +440,7 @@ function listfilters()	{
 		});
 
 		listfilters();
+		readalldata();
 
 	});
 

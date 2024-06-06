@@ -190,3 +190,11 @@ a {
 .tabsel	{
 	background-color: #525;
 }
+
+#waiting	{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	font-size: 96px;
+	color: #ddd;
+}

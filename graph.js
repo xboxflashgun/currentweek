@@ -290,4 +290,6 @@ function drawgraph(f)	{
 
 	});
 
+	d3.select("#waiting").style("display", "none");
+
 }
