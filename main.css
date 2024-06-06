@@ -15,7 +15,7 @@ body {
 
 #gamediv	{
 	width: 288px;
-	height: 900px; 
+	height: 796px; 
 	float: left;
 	overflow-y: hidden;
 }
@@ -52,6 +52,14 @@ body {
 	padding-left: 4px;
 }
 
+#filtclear	{
+	float: right;
+	padding-right: 5px;
+	font-size: 14px;
+	color: #ddd;
+	cursor: pointer;
+}
+
 #linechart	{
 	width: 1148px;
 	height: 580px;
@@ -78,7 +86,7 @@ body {
 	margin: 0px 3px;
 	border-radius: 4px;
 	color: #ddd;
-	font-size: 12px;
+	font-size: 11px;
 	cursor: pointer;
 }
 
@@ -132,6 +140,10 @@ body {
 	color: #ddd;
 }
 
+.filtselected	{
+	background-color: #313;
+}
+
 #legend	{
 	position: absolute;
 	background-color: rgba(64, 32, 64, 0.8);
@@ -140,6 +152,16 @@ body {
 	border: 1px solid #999;
 	border-radius: 5px;
 	font-size: 12px;
+}
+
+.legendhead	{
+	color: #ccc;
+	border-bottom: 1px solid #bbb;
+	padding-bottom: 4px;
+}
+
+#legend td:nth-child(3)	{
+	text-align: right;
 }
 
 #graphtip	{
@@ -161,4 +183,5 @@ a {
 	font-size: 12px;
 	text-align: right;
 	width: 100%;
+	margin-top: 20px;
 }

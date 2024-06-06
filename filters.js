@@ -425,6 +425,21 @@ function listfilters()	{
 
 	});
 
+	d3.select("#filtclear").on('click', () => {
+
+		filters.forEach( f => {
+
+			if( ! f.tab )
+				return;
+
+			f.sels.clear();
+
+		});
+
+		listfilters();
+
+	});
+
 
 }
 
