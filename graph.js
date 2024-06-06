@@ -34,30 +34,75 @@ function timegraph(f)	{
 	
 		// f.ref is here
 		
-		var ref = {};
-		Object.keys(data).forEach( id => {
-			data[id].forEach( p => {
+		var sels = 0;	// get number of selections in 'genre' and 'game' filters
+		filters.filter( d => d.name === 'genre' || d.name === 'game' ).map( d => sels += d.sels.size );
 
-				ref[p.utime] ??= 0;
-				ref[p.utime] += p.players;
+		if( (f.name === 'country' || f.name === 'genre') && sels > 0 )	{
+
+			// calc over total gamers w/o filter
+
+			var list = Object.keys(data).join(',');
+
+			fetch("api/gettsv.php?f=gettimeref" + makereqstr() + "&subj=" + f.name + "&list=" + list)
+			.then( res => res.text() )
+			.then( res => {
+
+				var ref = {};
+				res.split('\n').forEach( s => {
+
+					if(s.length === 0)
+						return;
+
+					var row = s.split('\t');
+					// utime, subj, players
+					ref[row[1]] ??= {};
+					ref[row[1]][row[0]] = +row[2];
+
+				});
+
+				Object.keys(data).forEach( id => {
+					data[id].forEach( p => {
+	
+						p.ref = ref[id][p.utime] ?? 0;
+	
+					});
+
+				});
+			
+				graphstat();
+
+				setvals( filters.find( d => d.name === 'graph' ) );
+				drawgraph(f);
 
 			});
-		});
+			
+		} else	{
 
-		Object.keys(data).forEach( id => {
-			data[id].forEach( p => {
-
-				p.ref = ref[p.utime];
-
+			// calc over sum of list
+			var ref = {};
+			Object.keys(data).forEach( id => {
+				data[id].forEach( p => {
+	
+			ref[p.utime] ??= 0;
+					ref[p.utime] += p.players;
+	
+				});
 			});
-		});
 
-		console.log(ref);
-		console.log(data);
-		graphstat();
+			Object.keys(data).forEach( id => {
+				data[id].forEach( p => {
+	
+					p.ref = ref[p.utime];
+	
+				});
+			});
 
-		setvals( filters.find( d => d.name === 'graph' ) );
-		drawgraph(f);
+			graphstat();
+
+			setvals( filters.find( d => d.name === 'graph' ) );
+			drawgraph(f);
+
+		}
 
 	});
 

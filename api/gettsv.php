@@ -194,3 +194,52 @@ function gettimegraph()	{
 
 }
 
+# for subj = country and lang only
+function gettimeref()	{
+
+	global $db;
+
+	$where = "";		# filter condition
+
+	static $sels = array(
+		"country" => "countryid",
+		"lang" => "langid",
+	);
+
+	$subj = $sels[$_GET['subj']];
+
+	if(strlen($_GET['country']) > 0)
+		$where .= "countryid=any(array[" . $_GET['country'] . "])";
+	else
+		$where .= "countryid is not null";
+
+	if(strlen($_GET['lang']) > 0)
+		$where .= " and langid=any(array[" . $_GET['lang'] . "])";
+	else
+		$where .= " and langid is not null";
+
+	$list = "$subj=any(array[" . $_GET['list'] . "])";
+
+	$req = "
+		select * from (
+			select
+				utime,
+				$subj,
+				sum(players) as players
+			from stattab
+			where $where
+			and type=0
+			group by 1,2
+		) as tab
+		where $list
+	";
+
+	error_log($req);
+	echo implode(pg_copy_to($db, "(
+		$req
+	)", chr(9)));
+
+	pg_close($db);
+
+}
+
