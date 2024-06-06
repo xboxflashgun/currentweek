@@ -82,6 +82,8 @@ function gametab(f)	{
 	else
 		fff = a => true;
 
+	var playmax = d3.max(f.tab, d => d.players);
+
 	tab.selectAll("tr")
 	.data(f.tab
 		.filter(d => fff(d.name))
@@ -91,10 +93,12 @@ function gametab(f)	{
 		row.attr("data-id", d => d.id);
 		row.append("td").text( d => d.name);
 		row.append("td").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
+		row.style("background", d => `linear-gradient(to right, #252 ${100.*d.players/playmax}%, rgba(0,0,0,0) ${100.*d.players/playmax}% )`);
 	}, update => {
 		update.attr("data-id", d => d.id);
 		update.select("td:nth-child(1)").text(d => d.name);
 		update.select("td:nth-child(2)").text( d => d3.format( percflag ? ".3%" : ".3~s" )(d.val));
+		update.style("background", d => `linear-gradient(to right, green ${100.*d.players/playmax}%, rgba(0,0,0,0) ${100.*d.players/playmax}% )`);
 	}, exit => {
 		exit.remove();
 	});
@@ -190,14 +194,14 @@ function horizbar(f)	{
 		d3.select(e.target).attr("fill", f.sels.has(id) ? 'red' : 'green');
 	});
 
-	f.svg.selectAll("text").on("click", (e) => {
+	f.yaxis.selectAll("text").on("click", (e) => {
 		var name = d3.select(e.target).text();
 		var id = Object.keys(f.idname).filter( d => f.idname[d][0] === name )[0];
 		if( ! id )
 			return;
 		select(f, id);
 		d3.select(e.target).attr("color", f.sels.has(id) ? '#fff' : null);
-	});
+	}).style("cursor", "pointer");
 
 	f.svg.selectAll("text").attr("color", null);
 	f.svg.selectAll("text")

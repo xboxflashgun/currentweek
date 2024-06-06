@@ -234,7 +234,8 @@ function gettimeref()	{
 		where $list
 	";
 
-	error_log($req);
+	# error_log($req);
+	
 	echo implode(pg_copy_to($db, "(
 		$req
 	)", chr(9)));
