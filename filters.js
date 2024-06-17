@@ -164,6 +164,8 @@ function horizbar(f)	{
 	f.yaxis
 		.call(d3.axisRight(f.y));
 
+	const t = d3.transition().duration(750);
+
 	f.svg.selectAll("rect")
 		.data(f.tab)
 	.join(enter => {
@@ -176,14 +178,14 @@ function horizbar(f)	{
 			.attr("data-id", d => d.id)
 			.style("opacity", 0.5);
 	}, update => {
-		update
+		update.call(s => s.transition(t)
 			.attr("x", f.x(0))
 			.attr("y", d => f.y(d.name))
 			.attr("width", d => f.x(d.val))
 			.attr("height", f.y.bandwidth())
 			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
 			.attr("data-id", d => d.id)
-			.style("opacity", 0.5);
+			.style("opacity", 0.5));
 	}, exit => {
 		exit.remove();
 	});
@@ -270,6 +272,8 @@ function barchart(f)	{
 		.duration(700)
 		.call(d3.axisLeft(f.y).tickFormat(d3.format( percflag ? ".0%" : ".0s")));
 	
+	const t = d3.transition().duration(750);
+
 	// bars
 	f.svg.selectAll("rect")
 	.data(f.tab)
@@ -283,13 +287,13 @@ function barchart(f)	{
 			.attr("data-id", d => d.id)
 			.append("title").text(d => d.title + '\n' + d.players);
 	}, update => {
-		update
+		update.call( s => s.transition(t)
 			.attr("x", d => f.x(d.name))
 			.attr("y", d => f.y(d.val))
 			.attr("width", f.x.bandwidth())
 			.attr("height", d => height - f.y(d.val))
 			.attr("fill", d => f.sels.has(d.id) ? 'red' : 'green')
-			.attr("data-id", d => d.id);
+			.attr("data-id", d => d.id));
 		update.select("title").text( d => d.title + '\n' + d.players);
 	}, exit => {
 		exit

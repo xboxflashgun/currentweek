@@ -154,6 +154,8 @@ function drawgraph(f)	{
 
 	grsvg.selectAll(".yaxis")
 		.call( yaxis );
+
+	const t = d3.transition().duration(750);
 	
 	grsvg.selectAll(".line")
 	.data(Object.keys(data))
@@ -166,10 +168,10 @@ function drawgraph(f)	{
 			.attr("stroke-width", 1.5)
 			.attr("d", id => d3.line(d => x(d.time), d => y(d.val) )(data[id]));
 	}, update => {
-		update
+		update.call( s => s.transition(t)
 			.attr("stroke", id => color(id))
 			.attr("data-id", id => id)
-			.attr("d", id => d3.line(d => x(d.time), d => y(d.val) )(data[id]));
+			.attr("d", id => d3.line(d => x(d.time), d => y(d.val) )(data[id])));
 	}, exit => {
 		exit.remove();
 	});
@@ -264,7 +266,7 @@ function drawgraph(f)	{
 		row.append("td").text(d => legendname(d));
 		row.append("td").text("");
 	}, update => {
-		update.select("td:nth-child(2)").text(d => legendname(d) );
+		update.select("td:nth-child(2)").call(s => s.transition(t).text(d => legendname(d) ));
 		update.attr("data-id", d => d);
 	}, exit => {
 		exit.remove();
