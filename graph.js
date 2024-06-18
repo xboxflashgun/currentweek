@@ -63,6 +63,8 @@ function timegraph(f)	{
 				Object.keys(data).forEach( id => {
 					data[id].forEach( p => {
 	
+						if(! ref[id])
+							console.log(data, id, ref, p);
 						p.ref = ref[id][p.utime] ?? 0;
 	
 					});
@@ -225,7 +227,10 @@ function drawgraph(f)	{
 		tip.style("top", e.clientY - 61 + "px")
 			.style("left", e.clientX + "px")
 			.style("display", null)
-		tip.html(`Date: ${d.time.toLocaleString().slice(0,17)}<br />Players: ${d.players}<br />${f.idname[id][0]}`);
+		
+		if(f.idname)
+			tip.html(`Date: ${d.time.toLocaleString().slice(0,17)}<br />Players: ${d.players}<br />${f.idname[id][0]}`);
+
 		clearTimeout(to);
 
 	})

@@ -12,11 +12,32 @@ foreach ($_GET as $k => $v)     {
 
 }
 
+$mc = new Memcached('xboxstat2');
+if (!count($mc->getServerList()))
+	$mc->addServer( '127.0.0.1', 11211 );
+
+$rep = $mc->get($_SERVER['QUERY_STRING']);
+
+if( $rep )      {
+	echo $rep;
+	return 0;
+}
+
 $db = pg_connect("port=6432 dbname=global user=readonly password=masha27uk", PGSQL_CONNECT_FORCE_NEW)
 	or die("could not connect to DB");
 
+$rep = "";
+
 if( substr( $_GET['f'], 0, 3) == 'get' )
 	$_GET['f']();
+
+$to = 1;
+
+$mc->set($_SERVER['QUERY_STRING'], $rep, $to);
+
+header("Cache-control: max-age=$to");
+echo $rep;
+
 
 /////////
 //  usage: GET api/gettsv.php?f=func&par=parameters
@@ -24,18 +45,18 @@ if( substr( $_GET['f'], 0, 3) == 'get' )
 
 function getcatalog()	{
 
-	global $db;
+	global $db, $rep;
 
 	static $select = array(
-		"country" => "countryid,country,name from stattotals0 join countries using(countryid)",
-		"lang" => "langid,lang,name from stattotals0 join languages using(langid)",
-		"genre" => "genreid,genre,genre from genres join gamegenres using(genreid) join stattotals0 using(titleid)",
-		"game" => "titleid,name,'' from games join stattotals0 using(titleid)"
+		"country" => "countryid,country,name from stattotals1 join countries using(countryid)",
+		"lang" => "langid,lang,name from stattotals1 join languages using(langid)",
+		"genre" => "genreid,genre,genre from genres join gamegenres using(genreid) join stattotals1 using(titleid)",
+		"game" => "titleid,name,'' from games join stattotals1 using(titleid)"
 	);
 
 	$sel = $select[$_GET['cat']];
 
-	echo implode(pg_copy_to($db, "(
+	$rep = implode(pg_copy_to($db, "(
 
 		select distinct $sel
 
@@ -45,7 +66,7 @@ function getcatalog()	{
 
 function getdata()	{
 
-	global $db;
+	global $db, $rep;
 
 	$select = '';
 	$where = 'true';
@@ -56,7 +77,7 @@ function getdata()	{
 		if(strlen($_GET['country']) > 0)
 			$where .= " and countryid=any(array[" . $_GET['country'] . "])";
 		else
-			$where .= " and countryid is null";
+			$where .= " and countryid=0";
 	else
 		$select = "countryid";
 
@@ -65,7 +86,7 @@ function getdata()	{
 		if(strlen($_GET['lang']) > 0)
 			$where .= " and langid=any(array[" . $_GET['lang'] . "])";
 		else
-			$where .= " and langid is null";
+			$where .= " and langid=0";
 	else
 		$select = "langid";
 
@@ -90,28 +111,28 @@ function getdata()	{
 	if(!isset($_GET['game']) || !isset($_GET['genre']))
 		$union = "
 			union
-			select null::smallint,sum(players)
-			from stattotals0
+			select 0,sum(players)
+			from stattotals1
 			$join
 			where $where
 			group by 1
 		";
 
 	if( isset($_GET['game']) && isset($_GET['genre']) && strlen($_GET['genre']) == 0 && strlen($_GET['game']) == 0 )
-		$where .= " and titleid is null";
+		$where .= " and titleid=0";
 
 	$req = "
 		select $select,sum(players)
-		from stattotals0
+		from stattotals1
 		$join
 		where $where
 		group by 1
 		$union
 	";
 
-#	error_log($req);
+	error_log($req);
 
-	echo implode(pg_copy_to($db, "(
+	$rep = implode(pg_copy_to($db, "(
 
 		$req
 
@@ -122,7 +143,7 @@ function getdata()	{
 
 function gettimegraph()	{
 
-	global $db;
+	global $db, $rep;
 
 	$where = "";		# filter condition
 
@@ -171,7 +192,7 @@ function gettimegraph()	{
 		group by 1,2
 	");
 
-	echo implode(pg_copy_to($db, "(
+	$rep = implode(pg_copy_to($db, "(
 		select
 			*
 		from res
@@ -197,16 +218,18 @@ function gettimegraph()	{
 # for subj = country and lang only
 function gettimeref()	{
 
-	global $db;
+	global $db, $rep;
 
 	$where = "";		# filter condition
 
 	static $sels = array(
 		"country" => "countryid",
 		"lang" => "langid",
+		"genre" => "genreid",
 	);
 
 	$subj = $sels[$_GET['subj']];
+	$join = ($subj == 'genreid') ? 'join gamegenres using(titleid)' : '';
 
 	if(strlen($_GET['country']) > 0)
 		$where .= "countryid=any(array[" . $_GET['country'] . "])";
@@ -227,6 +250,7 @@ function gettimeref()	{
 				$subj,
 				sum(players) as players
 			from stattab
+			$join
 			where $where
 			and type=0
 			group by 1,2
@@ -236,7 +260,7 @@ function gettimeref()	{
 
 	# error_log($req);
 	
-	echo implode(pg_copy_to($db, "(
+	$rep = implode(pg_copy_to($db, "(
 		$req
 	)", chr(9)));
 

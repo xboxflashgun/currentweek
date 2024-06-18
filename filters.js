@@ -494,7 +494,7 @@ function readdata(f)	{
 			var [id, players] = s.split('\t');
 			players = +players;
 
-			if(id === '\\N')
+			if(id === '0')
 				f.ref = players;
 			else
 				f.tab.push( {id: id, players: players} );
