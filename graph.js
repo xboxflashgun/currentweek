@@ -218,7 +218,8 @@ function drawgraph(f)	{
 
 		legend.select(".legendhead").text(d.time.toLocaleString().slice(0,17));
 		Object.keys(data).forEach( id => {
-			legend.select(`tr[data-id="${id}"] td:nth-child(3)`).text(data[id][ind].players);
+			if(data[id][ind])
+				legend.select(`tr[data-id="${id}"] td:nth-child(3)`).text(data[id][ind].players);
 		});
 
 		d3.select(e.target).attr("stroke-width", 3);

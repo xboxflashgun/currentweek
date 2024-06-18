@@ -31,7 +31,7 @@ $rep = "";
 if( substr( $_GET['f'], 0, 3) == 'get' )
 	$_GET['f']();
 
-$to = 1;
+$to = 300;
 
 $mc->set($_SERVER['QUERY_STRING'], $rep, $to);
 
@@ -130,7 +130,7 @@ function getdata()	{
 		$union
 	";
 
-	error_log($req);
+	# error_log($req);
 
 	$rep = implode(pg_copy_to($db, "(
 
